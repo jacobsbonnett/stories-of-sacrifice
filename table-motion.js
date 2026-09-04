@@ -5,7 +5,8 @@ const awaitingCardChoice=()=>typeof pendingCardChoice!=='undefined'&&!!pendingCa
 const pause=(ms)=>new Promise(resolve=>setTimeout(resolve,reducedMotion()?0:ms));
 function fanCards(container,opponent=false){
   const cards=[...container.children],n=cards.length;
-  const step=Math.min(opponent?36:64,Math.max(8,(container.clientWidth-(opponent?90:150))/Math.max(1,n-1)));
+  const cardWidth=cards[0]?.offsetWidth||(opponent?85:180);
+  const step=Math.min(opponent?36:78,Math.max(8,(container.clientWidth-cardWidth)/Math.max(1,n-1)));
   cards.forEach((node,index)=>{const offset=index-(n-1)/2;node.style.setProperty('--fan-x',`${offset*step}px`);node.style.setProperty('--fan-y',`${Math.abs(offset)*5}px`);node.style.setProperty('--fan-angle',`${offset*Math.min(6,30/Math.max(1,n-1))}deg`);node.style.setProperty('--fan-z',index+1)});
 }
 function backCard(){const node=document.createElement('div');node.className='card card-back';node.setAttribute('aria-label','Face-down rival card');return node;}
@@ -68,7 +69,8 @@ aiTurn=async function(){
   log('The Rival plays its hand…');
   async function playRivalEffects(){
     while(!state.over){
-      if(state.ai.hand.length){playCard(0,true);render();await pause(620);continue;}
+      const playable=state.ai.hand.findIndex(canPlayCard);
+      if(playable>=0){playCard(playable,true);render();await pause(620);continue;}
       const index=state.ai.champions.findIndex(c=>c.ready);if(index<0)break;
       activateChampion(index,true);render();await pause(250);
     }
@@ -84,5 +86,5 @@ aiTurn=async function(){
   log('Your turn. The Crossroads await.');render();
 };
 $('#endTurn').onclick=()=>endTurn();
-$('#playAll').onclick=async()=>{if(awaitingCardChoice()||motion.busy||state.turn!=='player'||state.over)return;motion.busy=true;try{while(state.player.hand.length){motion.internal=true;playCard(0);motion.internal=false;render();if(awaitingCardChoice())await cardChoiceFinished;await pause(300);}}finally{motion.internal=false;motion.busy=false;render();}};
+$('#playAll').onclick=async()=>{if(awaitingCardChoice()||motion.busy||state.turn!=='player'||state.over)return;motion.busy=true;try{while(state.player.hand.some(canPlayCard)){motion.internal=true;playCard(state.player.hand.findIndex(canPlayCard));motion.internal=false;render();if(awaitingCardChoice())await cardChoiceFinished;await pause(300);}}finally{motion.internal=false;motion.busy=false;render();}};
 window.addEventListener('resize',()=>{if(state.player){fanCards($('#hand'));fanCards($('#opponentHand'),true)}});

@@ -19,7 +19,7 @@
     <div class="setup-intro-copy">
     <p class="eyebrow">A shared-market deck-building game</p>
     <h1><img class="setup-logo" src="assets/stories-logo.png" width="1536" height="1024" alt="Stories of Sacrifice"></h1>
-    <p class="lede">Choose four Chronicles. Build your deck, court the Legends, and be the first to claim 40 Prestige.</p>
+    <p class="lede">Build your deck, court the Legends, and race for Prestige. Play solo with four Chronicles, or choose two each with a friend.</p>
     <p id="selectionHelp" class="selection-help">Choose exactly four Chronicles.</p>
     <div class="setup-actions"><button id="startGame" class="primary" disabled>Begin the Story</button><button class="secondary card-library-button">View Card Library</button></div>
     </div>
@@ -31,7 +31,7 @@
       <p>Actions go directly to your Rest pile after resolving. Only Champions and Guards stay on the field.</p>
       <p>After use, one-time-use cards rest until turn end, then return to the Crossroads stock. They cannot be drawn again that turn.</p>
       <p>The Common Purse is always available in the Hall: pay 2 Grendels to replace a Copper in your Rest pile with a Silver worth 2 Grendels. It uses your Legend invocation and has no Allegiance dial.</p>
-      <p>You may invoke one Legend each turn. A Legend facing you grants Allegiance. End a turn with all four Legends facing you for an immediate victory, or reach 40 Prestige and survive the rival's final response.</p>
+      <p>You may invoke one Legend each turn. A Legend facing you grants Allegiance. All four Legends facing you wins. At 40 Prestige, your opponent gets a response turn: if only one player has 40 or more, the higher score wins. If both have 40 or more, the final target becomes 80. At 80, allow a response turn and compare scores; an exact tie is a draw. The target never increases beyond 80.</p>
     </details>
     <img class="game-box-art" src="assets/game-box.png" width="1254" height="1254" alt="Stories of Sacrifice black-and-gold game box">
   </div>
@@ -84,8 +84,10 @@
       <li><strong>Invoke one Legend</strong> per turn if you can pay its cost.</li>
       <li><strong>End your turn.</strong> Leftover Power becomes Prestige and you draw five new cards.</li>
     </ol>
-    <p>Reach 40 Prestige and remain ahead after the rival's response, or control all four Legends at the end of your turn.</p>
+    <p>At 40 Prestige, allow the opponent a response turn. If both players reach 40, continue to a final target of 80. At 80, the higher score after the response wins; equal scores draw. Controlling all four Legends also wins.</p>
     <p>The always-neutral Common Purse lets you pay 2 Grendels and exchange a Copper in your Rest pile for a Silver worth 2 Grendels. This uses your Legend invocation. It does not count toward the four-dial victory.</p>
+    <p>Gorgon's Curse: Petrify 1 creates one new Petrified Villager in your opponent's Rest pile without replacing a card. Villagers cannot be played. At the start of your turn, move Villagers from your hand to Rest without drawing replacements. A Villager drawn mid-turn stays unplayable and goes to Rest during normal end-turn cleanup.</p>
+    <p>Medusa removes all Petrified Villagers from your Rest pile and grants 1 Power per 2 removed, rounded down. Pay 4 Grendels when neutral, 3 when favoring you, or 5 when favoring your opponent. This uses your Legend invocation and moves the dial one step toward you. You may invoke with an empty Rest pile, but gain no Power.</p>
   </dialog>
   <dialog id="resultDialog">
     <div class="result-sigil">✦</div><h2 id="resultTitle"></h2><p id="resultText"></p><button id="resultRestart" class="primary">Write another story</button>
@@ -102,14 +104,17 @@
     <div id="sacrificeCards" style="display:grid;gap:10px"></div>
     <form method="dialog"><button style="margin-top:16px">Cancel</button></form>
   </dialog>
-  <script src="game.js?v=seraphine-choice-1"></script>
+  <script src="game.js?v=gorgon-1"></script>
   <dialog id="championTargetDialog" aria-labelledby="championTargetTitle"><h2 id="championTargetTitle">The Assassin — Choose a Champion</h2><p>Deal 2 damage to one opposing Champion.</p><div id="championTargets"></div></dialog>
   <dialog id="lawDiscardDialog" aria-labelledby="lawDiscardTitle"><h2 id="lawDiscardTitle">Law in Effect — Discard from your hand</h2><p id="lawDiscardCount"></p><div id="lawDiscardCards" style="display:grid;gap:10px"></div></dialog>
   <script src="crimson-deck.js?v=midnight-art-2"></script>
   <script src="midnight-deck.js?v=1"></script>
-  <script src="table-motion.js?v=midnight-turns-2"></script>
-  <script src="character-tokens.js?v=1"></script>
+  <script src="gorgon-deck.js?v=1"></script>
+  <script src="table-motion.js?v=gorgon-1"></script>
+  <script src="character-tokens.js?v=gorgon-1"></script>
   <link rel="stylesheet" href="multiplayer.css">
-  <script src="multiplayer.js?v=1"></script>
+  <script src="multiplayer.js?v=gorgon-1"></script>
+  <link rel="stylesheet" href="board-readability.css?v=2">
+  <script src="board-readability.js?v=2"></script>
 </body>
 </html>

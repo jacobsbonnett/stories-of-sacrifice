@@ -30,7 +30,7 @@ function acceptOnline(data){
   online.revision=data.revision;Object.assign(state,data.state);
   $('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
   render();$('#log').textContent=state.message;showOnlineChoice();
-  if(state.over&&!online.shownResult){online.shownResult=true;$('#resultTitle').textContent=state.winner==='player'?'You won!':'Your friend won';$('#resultText').textContent=state.message;$('#resultDialog').showModal();}
+  if(state.over&&!online.shownResult){online.shownResult=true;$('#resultTitle').textContent=state.winner==='draw'?'The match is a draw':state.winner==='player'?'You won!':'Your friend won';$('#resultText').textContent=state.message;$('#resultDialog').showModal();}
  }
  setStatus(!online.ready?'Waiting for your friend…':state.over?'Match finished':state.turn==='player'?'Online · Your turn':`Online · ${state.ai.name}’s turn`);
  $('#endTurn').disabled=!online.ready||state.turn!=='player'||!!state.choice||state.over;
@@ -70,7 +70,7 @@ $('#endTurn').onclick=()=>endTurn();
 const soloPlayAll=$('#playAll').onclick;
 $('#playAll').onclick=async()=>{
  if(!online.room)return soloPlayAll();
- while(state.player.hand.length&&!state.choice&&state.turn==='player'&&!state.over){if(!await playCard(0))break;}
+ while(state.player.hand.some(canPlayCard)&&!state.choice&&state.turn==='player'&&!state.over){if(!await playCard(state.player.hand.findIndex(canPlayCard)))break;}
 };
 $('#onlineHost').onclick=async()=>{
  if(online.busy)return;online.busy=true;

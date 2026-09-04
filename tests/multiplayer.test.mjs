@@ -6,6 +6,29 @@ import {createEngine} from '../dist/server/engine.js';
 import worker from '../dist/server/index.js';
 const selected=['crimson','midnight','gilded','hours'];
 const setup=()=>createEngine().create(selected,['Alice','Bob']);
+test('40 target: response below 40 loses, but both at 40 advance to 80 regardless of leader',()=>{
+ for(const starter of [0,1])for(const response of [39,40,42,44]){
+  let s=setup();const side=starter?'ai':'player',other=starter?'player':'ai';s.turn=side;s[side].prestige=42;s[other].prestige=38;
+  s=createEngine().move(s,starter,{type:'end'});assert.equal(s.over,false);assert.equal(s.finale,side);
+  s[other].prestige=response;s=createEngine().move(s,1-starter,{type:'end'});
+  if(response<40){assert.equal(s.over,true);assert.equal(s.winner,side);}else{assert.equal(s.over,false);assert.equal(s.prestigeTarget,80);assert.equal(s.finale,null);}
+ }
+});
+test('80 is final: compare after response, never increase, equal scores draw',()=>{
+ for(const starter of [0,1])for(const response of [79,80,82,84]){
+  let s=setup();const side=starter?'ai':'player',other=starter?'player':'ai';s.turn=side;s.prestigeTarget=80;s[side].prestige=82;s[other].prestige=75;
+  s=createEngine().move(s,starter,{type:'end'});assert.equal(s.over,false);assert.equal(s.finale,side);
+  s[other].prestige=response;s=createEngine().move(s,1-starter,{type:'end'});
+  assert.equal(s.over,true);assert.equal(s.prestigeTarget,80);assert.equal(s.winner,response===82?'draw':response>82?other:side);
+ }
+});
+test('80 target persists through lower scores; allegiance still wins; resources remain public',()=>{
+ let s=setup();s.prestigeTarget=80;s.player.prestige=39;s.ai.prestige=41;s.ai.grendels=7;s.ai.power=5;
+ s=createEngine().move(s,0,{type:'end'});assert.equal(s.over,false);assert.equal(s.prestigeTarget,80);
+ const view=createEngine().view(s,0);assert.equal(view.ai.grendels,7);assert.equal(view.ai.power,5);
+ s.legends=Object.fromEntries(selected.map(k=>[k,'ai']));s=createEngine().move(s,1,{type:'end'});assert.equal(s.winner,'ai');
+ assert.equal(setup().prestigeTarget,40);
+});
 test('seat orientation, private hands and private draw order',()=>{
  const s=setup();for(const seat of [0,1]){const v=createEngine().view(s,seat);assert.equal(v.player.name,seat?'Bob':'Alice');assert.equal(v.turn,seat?'ai':'player');
  for(const pile of [v.ai.hand,v.ai.draw,v.player.draw,v.marketDeck])for(const c of pile){assert.deepEqual(Object.keys(c),['id','hidden']);assert.ok(c.id.startsWith('hidden-'));}
@@ -32,9 +55,10 @@ test('all serialized target choices work for both players',()=>{
   s=createEngine().move(s,seat,{type:'choose',id:'target'});assert.equal((seat?s.player:s.ai).champions[0].durability,3);assert.equal(s.choice,null);
   assert.equal((seat?s.ai:s.player).champions[0].ready,false);
   assert.throws(()=>createEngine().move(s,seat,{type:'effect',id:'assassin'}),/used/);
-  const own=seat?s.ai:s.player;own.discard=[{id:'sac',cost:6}];own.playedThisTurn=['sac'];
-  s=createEngine().move(s,seat,{type:'invoke',key:'gilded'});assert.equal(s.choice.kind,'sacrifice');
-  s=createEngine().move(s,seat,{type:'choose',id:'sac'});assert.equal((seat?s.ai:s.player).prestige,3);
+  const own=seat?s.ai:s.player;own.grendels=4;
+  own.discard=[0,1].map(i=>({id:'stone'+i,name:'Petrified Villager',type:'token',suit:'gilded'}));
+  s=createEngine().move(s,seat,{type:'invoke',key:'gilded'});assert.ok(!s.choice);
+  assert.equal((seat?s.ai:s.player).discard.length,0);assert.equal((seat?s.ai:s.player).power,1);
   const next=seat?s.player:s.ai;next.pendingDiscards=2;
   s=createEngine().move(s,seat,{type:'end'});assert.equal(s.choice.kind,'law-discard');
   for(let i=0;i<2;i++){const active=seat?s.player:s.ai;s=createEngine().move(s,1-seat,{type:'choose',id:active.hand[0].id});}
@@ -52,7 +76,8 @@ test('room API: invitations, third seat denial, actions, retries, stale state, r
  const guest=(await call(base+'/join',{invite:host.invite,name:'Bob',selected:selected.slice(2)})).data;assert.ok(guest.token);assert.deepEqual(guest.state.selected,selected);
  assert.equal((await call(base+'/join',{invite:host.invite,name:'Third'})).status,409);
  const snapshot=(await call(base,null,host.token)).data;assert.equal(snapshot.ready,true);
- const action={requestId:crypto.randomUUID(),revision:snapshot.revision,action:{type:'play',id:snapshot.state.player.hand[0].id}};
+ // Select a non-drawing starter so the hand-size assertion is independent of shuffle.
+ const action={requestId:crypto.randomUUID(),revision:snapshot.revision,action:{type:'play',id:snapshot.state.player.hand.find(c=>c.name==='Copper').id}};
  const played=await call(base+'/actions',action,host.token);assert.equal(played.status,200);
  const retry=await call(base+'/actions',action,host.token);assert.equal(retry.data.revision,played.data.revision);
  assert.equal((await call(base+'/actions',{...action,requestId:crypto.randomUUID()},host.token)).status,409);

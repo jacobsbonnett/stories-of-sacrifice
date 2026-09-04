@@ -27,7 +27,7 @@ function act(action){
   return;
  }
  switch(action.type){
-  case 'play':playCard(indexOf(state.player.hand,action.id));break;
+  case 'play':{const i=indexOf(state.player.hand,action.id);if(!canPlayCard(state.player.hand[i]))throw new Error('This card cannot be played.');playCard(i);break;}
   case 'effect':{const i=indexOf(state.player.champions,action.id);if(!state.player.champions[i].ready)throw new Error('Effect already used.');activateChampion(i);break;}
   case 'buy':if(!buy(indexOf(state.market,action.id)))throw new Error('Not enough Grendels.');break;
   case 'attack':if(!attackChampion(indexOf(state.ai.champions,action.id)))throw new Error('Cannot attack that Champion.');break;
@@ -40,6 +40,7 @@ function act(action){
    p.grendels=0;p.discount=0;draw(p,5);
    state.turn='ai';state.invoked=false;state.chain={};
    state.ai.champions.forEach(c=>c.ready=true);
+   restPetrifiedVillagers(state.ai);
    const count=Math.min(state.ai.pendingDiscards||0,state.ai.hand.length);state.ai.pendingDiscards=0;
    if(count)state.choice={kind:'law-discard',remaining:count};
    state.message='Turn passed.';break;

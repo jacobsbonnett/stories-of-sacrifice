@@ -1,0 +1,17 @@
+#hand.hand{height:300px}
+#hand.hand>.card{width:180px;height:257px;top:15px;aspect-ratio:7/10}
+#hand.hand>.card:hover,#hand.hand>.card:focus-visible{transform:translateX(calc(-50% + var(--fan-x))) translateY(-65px) rotate(0deg) scale(1.5)}
+.player-stats{flex-wrap:wrap;gap:12px}
+.inspect-champion-button{align-self:flex-end;padding:6px 8px;font-size:14px}
+/* Fixed previews escape panel clipping; the field buttons keep their action. */
+.champion-art:hover,.champion-art:focus-visible{transform:none}
+#championPreview{position:fixed;z-index:2000;pointer-events:none;width:min(370px,85vw);max-height:88vh;overflow:auto;background:#111b18;border:2px solid #c9a45e;border-radius:10px;padding:14px;box-shadow:0 16px 50px #000d}
+#championPreview[hidden]{display:none}
+#championPreview img{display:block;max-height:45vh;max-width:100%;margin:0 auto;object-fit:contain}
+#championPreview p,#inspectChampion p{font-size:16px;line-height:1.5;margin:10px 0}
+#championPreview h2,#inspectChampion h2{font-size:22px;margin:12px 0}
+#inspectChampion{max-width:620px;width:90vw;max-height:90vh;overflow:auto}
+#inspectChampion img{display:block;max-width:100%;max-height:58vh;margin:auto;object-fit:contain}
+#championPreview .damaged,#inspectChampion .damaged{color:#ff7777}
+#prestigeTarget{font-size:14px;align-self:center;color:#ead399}
+@media(max-width:600px){#hand.hand>.card{width:145px;height:207px}#hand.hand{height:260px}#hand.hand>.card:hover,#hand.hand>.card:focus-visible{transform:translateX(calc(-50% + var(--fan-x))) translateY(-45px) rotate(0deg) scale(1.25)}.resources{flex-wrap:wrap}}
