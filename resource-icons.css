@@ -2,7 +2,13 @@
 .resources .resource-counter{position:relative;min-width:102px;padding-right:44px}
 .resource-counter>b{min-width:2ch;font-variant-numeric:tabular-nums}
 .resource-icon{position:absolute;right:9px;bottom:7px;width:28px;height:28px;pointer-events:none;filter:drop-shadow(0 2px 2px #0009)}
-.resource-grendel{border-radius:50%;background:url('assets/copper-coin-faces.png') 97.5% 34%/209.3% 132.6% no-repeat}
+.resource-grendel{border-radius:50%;pointer-events:auto;perspective:220px;cursor:pointer;outline:none}
+.resource-grendel:focus-visible{box-shadow:0 0 0 2px #f0c45c,0 0 10px #e5a936}
+.resource-grendel-inner{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.7,.2,1)}
+.resource-grendel:hover .resource-grendel-inner,.resource-grendel:focus .resource-grendel-inner{transform:rotateY(180deg)}
+.resource-grendel-face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;background-image:url('assets/copper-coin-faces.png');background-repeat:no-repeat;background-size:209.3% 132.6%}
+.resource-grendel-face.g-face{background-position:97.5% 34%}
+.resource-grendel-face.griffin-face{background-position:2.3% 34%;transform:rotateY(180deg)}
 .resource-power{color:#f05249;font:28px/28px 'Segoe UI Symbol','Noto Sans Symbols 2',sans-serif;text-align:center;text-shadow:0 1px 0 #8e211c}
 .resource-prestige{overflow:visible}
 @media(max-width:520px){
