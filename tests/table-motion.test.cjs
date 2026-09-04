@@ -1,0 +1,31 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path');
+const node=()=>({dataset:{},style:{setProperty(){}},classList:{add(){},remove(){}},append(){},querySelector:()=>node(),setAttribute(){}});
+const elements=new Map();
+const context=vm.createContext({document:{querySelector:selector=>{if(!elements.has(selector))elements.set(selector,node());return elements.get(selector);},querySelectorAll:()=>[],createElement:()=>node()},crypto:require('node:crypto').webcrypto,console,setTimeout,matchMedia:()=>({matches:true}),addEventListener(){}});
+context.window=context;
+for(const file of ['game.js','table-motion.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..',file),'utf8'),context);
+// Use non-sacrificing Legends when checking conservation; sacrifice has separate tests.
+vm.runInContext('render=()=>{};log=()=>{};state.selected=["midnight","hours","crimson","velvet"];state.player=makePlayer("You");state.ai=makePlayer("Rival");state.legends={};state.market=[];state.marketDeck=[];draw(state.player,5);draw(state.ai,5);',context);
+const run=code=>vm.runInContext(code,context);
+(async()=>{
+  const before=run('state.player.hand.length');run("state.turn='ai';playCard(0);buy(0);activateChampion(0);invokeCommonPurse();");assert.equal(run('state.player.hand.length'),before);
+  run("state.turn='player';motion.busy=true;playCard(0)");assert.equal(run('state.player.hand.length'),before);run('motion.busy=false');
+  await run('endTurn()');assert.equal(run('state.turn'),'player');assert.equal(run('motion.busy'),false);assert.equal(run('state.player.hand.length'),5);assert.equal(run('state.ai.hand.length'),5);
+  assert.equal(run('state.player.hand.length+state.player.draw.length+state.player.discard.length+state.player.played.length+state.player.champions.length'),10);
+  assert.equal(run('state.ai.hand.length+state.ai.draw.length+state.ai.discard.length+state.ai.played.length+state.ai.champions.length'),10);
+  assert.equal(run('backCard().className'),'card card-back');
+  assert.ok(!run('pileMarkup(state.ai,"draw")').includes('Copper'));
+  run('state.player.hand=[basic(),basic(),basic(),basic()];state.player.grendels=0;state.player.discount=0;state.invoked=false;state.market=[basic("Silver")];state.market[0].cost=2;');
+  await elements.get('#playAll').onclick();
+  assert.equal(run('motion.busy'),false);
+  assert.equal(run('state.player.grendels'),4);
+  assert.equal(run('buy(0)'),true);
+  assert.equal(run('invokeCommonPurse()'),true);
+  assert.equal(run('state.player.grendels'),0);
+  run('state.player.hand=[basic(),basic(),basic(),basic()];state.invoked=false;');
+  await elements.get('#playAll').onclick();
+  assert.equal(run("invoke('midnight')"),true);
+  assert.equal(run('state.player.power'),2);
+  console.log('Motion tests passed: paced turn, five-card hands, card conservation, hidden backs, and input guards.');
+  console.log('Play all unlocks purchases, Common Purse exchanges, and Corven invocations.');
+})().catch(e=>{console.error(e);process.exitCode=1});

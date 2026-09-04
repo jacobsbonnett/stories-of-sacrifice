@@ -1,0 +1,7 @@
+.online-lobby{margin:24px auto;padding:22px;max-width:740px;border:1px solid #967b43;background:#131b19;border-radius:12px;text-align:center}
+.online-lobby input{padding:10px;margin:8px;color:#fff;background:#0c1110;border:1px solid #967b43;border-radius:5px;max-width:90%}
+.online-lobby button{margin:8px}.online-lobby p{color:#c8c0ad}
+#onlineDecks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));text-align:left;gap:8px}#onlineDecks label{font-size:14px}
+.online-status{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:1000;background:#16221f;border:1px solid #ac8940;border-radius:6px;padding:8px 14px;max-width:80vw;font-size:13px;box-shadow:0 4px 18px #0008}
+.online-status button{margin-left:12px;padding:5px 9px}.online-status:empty{display:none}
+#onlineChoice{max-width:660px;width:90vw;max-height:85vh;overflow:auto}#onlineChoiceList{display:grid;gap:10px}#onlineChoiceList button{text-align:left;padding:15px}

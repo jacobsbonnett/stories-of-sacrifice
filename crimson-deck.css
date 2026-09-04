@@ -1,0 +1,34 @@
+.card.illustrated-card{padding:0;border:0!important;background:#111;overflow:hidden}
+.printed-card{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+/* Keep market slots portrait-shaped instead of stretching across the table. */
+#market{display:grid;grid-template-columns:repeat(5,minmax(0,170px));justify-content:center;gap:12px;padding:0;overflow:visible}
+#market>.card{width:100%;min-width:0;height:auto;aspect-ratio:7/10}
+/* Raise the selected card without changing the market's layout or purchase target. */
+@media(min-width:601px){
+  #market>.card:hover,#market>.card:focus-visible{transform:translateY(-12px) scale(2.2);z-index:120;opacity:1;filter:none;box-shadow:0 18px 45px #000c}
+  #market>.card:first-child{transform-origin:left center}
+  #market>.card:last-child{transform-origin:right center}
+}
+@media(max-width:850px){
+  #market{grid-template-columns:repeat(5,minmax(0,150px));gap:8px}
+}
+@media(max-width:600px){
+  #market{display:flex;justify-content:flex-start;overflow-x:auto;padding:22px 6px 30px}
+  #market>.card{flex:0 0 140px;width:140px;height:200px;min-width:140px}
+  #market>.card:hover,#market>.card:focus-visible{transform:translateY(-8px) scale(1.06)}
+}
+.illustrated-card>.suit,.illustrated-card>h3,.illustrated-card>.type,.illustrated-card>.effect,.illustrated-card>.cost{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);padding:0}
+.champions{flex-wrap:wrap}
+.mini-champion{position:relative}
+.mini-champion.champion-art{width:100px;height:158px;padding:0;border:1px solid #b69455;overflow:visible;background:#111}
+.champion-art img{width:100%;height:140px;display:block;border-radius:4px;pointer-events:none}
+.current-health{display:inline-block;background:#211813;color:#fff4cf;padding:2px 6px;border:1px solid #ad854a;border-radius:4px}
+.champion-art .current-health{position:absolute;bottom:19px;left:39%;font:bold 20px Georgia;min-width:22px;text-align:center}
+.current-health.damaged{color:#ff6262}
+.effect-status{display:block;font:12px/16px system-ui;color:#f4e3be}
+.champion-art:hover,.champion-art:focus-visible{z-index:120;transform:scale(1.8);transform-origin:center center}
+.library-printed-card{display:block;width:100%;height:auto;margin-bottom:10px}
+#championTargets{display:grid;gap:10px}
+#championTargetDialog{max-height:85dvh;overflow:auto}
+#lawDiscardDialog{max-height:85dvh;overflow:auto}
+@media(prefers-reduced-motion:reduce){.champion-art{transition:none}}

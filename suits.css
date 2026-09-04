@@ -1,0 +1,49 @@
+/* Strong, readable suit identities inspired by classic tavern-card factions. */
+.choice{border-color:var(--suit,#536058);background:linear-gradient(140deg,color-mix(in srgb,var(--suit,#536058) 28%,#19201f),#101514 72%);box-shadow:inset 5px 0 0 var(--suit,#536058)}
+.choice:hover,.choice.selected{border-color:var(--suit,var(--grendels))}
+.choice.selected{box-shadow:inset 5px 0 0 var(--suit,var(--grendels)),inset 0 0 0 1px var(--suit,var(--grendels)),0 0 24px color-mix(in srgb,var(--suit,var(--grendels)) 25%,transparent)}
+.choice .check,.choice .eyebrow{color:var(--suit,var(--grendels))}
+.legend{background:linear-gradient(145deg,color-mix(in srgb,var(--suit,#536058) 24%,#202725),#121716 74%);border-color:var(--suit,var(--line));border-left:5px solid var(--suit,var(--line))}
+.legend h3{color:color-mix(in srgb,var(--suit,var(--grendels)) 72%,white)}
+.legend.player{border-color:var(--suit,var(--grendels));box-shadow:inset 0 -3px var(--grendels),0 0 15px color-mix(in srgb,var(--suit) 16%,transparent)}
+.legend.ai{border-color:var(--suit,var(--red));box-shadow:inset 0 3px var(--red),0 0 15px color-mix(in srgb,var(--suit) 16%,transparent)}
+.card{background:linear-gradient(155deg,color-mix(in srgb,var(--suit,#536058) 42%,#202725),color-mix(in srgb,var(--suit,#536058) 13%,#111615) 65%);border-color:var(--suit,#536058);border-top:5px solid var(--suit,#536058);box-shadow:0 8px 18px #0005,inset 0 0 34px color-mix(in srgb,var(--suit,#536058) 10%,transparent)}
+.card:hover{border-color:color-mix(in srgb,var(--suit,var(--grendels)) 70%,white);box-shadow:0 12px 26px #0009,0 0 18px color-mix(in srgb,var(--suit,var(--grendels)) 24%,transparent)}
+.card .cost{background:#151917;color:#fff4ce;border:2px solid var(--suit,var(--grendels));box-shadow:0 2px 8px #0008;font-weight:800}
+.card .suit{color:color-mix(in srgb,var(--suit,var(--grendels)) 68%,white)}
+.common-purse .grendel-coin{grid-column:1;grid-row:1/4;width:54px;height:54px}
+.exchange-reason{grid-column:2;font:12px/1.4 system-ui,sans-serif;color:var(--muted);margin-top:7px}
+.setup-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.library-dialog{width:min(1120px,94vw);max-width:1120px;height:min(820px,90dvh);max-height:90dvh;padding:0;overflow:hidden}
+.library-dialog[open]{display:flex;flex-direction:column}
+.library-header,.library-filters,.library-summary{flex-shrink:0}
+.library-header{display:flex;justify-content:space-between;gap:20px;padding:24px 28px 18px;border-bottom:1px solid var(--line);background:#121817}
+.library-header h2{margin:2px 0}.library-header p{margin:0}.library-header .dialog-close{position:static;align-self:flex-start}
+.library-filters{display:flex;gap:7px;padding:14px 28px;overflow-x:auto;border-bottom:1px solid var(--line);background:#0f1413}
+.library-filter{white-space:nowrap;border-left:4px solid var(--suit,#9b8c6b);padding:8px 11px}
+.library-filter.active{border-color:var(--suit,#9b8c6b);background:color-mix(in srgb,var(--suit,#9b8c6b) 30%,#202725);box-shadow:inset 0 0 0 1px var(--suit,#9b8c6b)}
+.library-summary{padding:14px 28px 6px;color:var(--muted);font:13px system-ui,sans-serif}
+.library-summary strong{color:var(--ink);font-family:Georgia,serif;font-size:18px;font-weight:400;margin-right:8px}
+.library-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:12px 28px 30px;overflow-y:auto;flex:1;min-height:0;align-content:start;scrollbar-gutter:stable;overscroll-behavior:contain}
+@media(max-height:450px){.library-dialog{overflow-y:auto}.library-cards{flex:none;overflow:visible}}
+.library-card{--suit:#9b8c6b;position:relative;min-height:154px;padding:14px;background:linear-gradient(145deg,color-mix(in srgb,var(--suit) 34%,#202725),#111615 75%);border:1px solid var(--suit);border-top:5px solid var(--suit);border-radius:6px}
+.library-card .quantity{position:absolute;right:10px;top:9px;color:#fff;background:var(--suit);border-radius:20px;padding:3px 8px;font:700 11px system-ui,sans-serif}
+.library-card .library-cost{color:color-mix(in srgb,var(--suit) 72%,white);font:700 10px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.1em}
+.library-card h3{font-weight:400;font-size:17px;margin:10px 36px 5px 0}.library-card .type{display:block;color:#b6ad98;font:italic 11px Georgia;margin-bottom:16px}.library-card p{font:12px/1.45 system-ui,sans-serif;color:#ded6c4;margin:0}.library-empty{grid-column:1/-1;color:var(--muted);text-align:center;padding:50px}
+@media(max-width:850px){.library-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.library-dialog{width:96vw}.library-header,.library-filters{padding-left:16px;padding-right:16px}.library-summary{padding-left:16px}.library-cards{grid-template-columns:1fr;padding-left:16px;padding-right:16px}.top-actions{gap:4px}.top-actions button{padding:8px}}
+
+/* Right-side Hall of Legends and allegiance dials */
+.hall-direction{font:700 9px system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;text-align:center;color:var(--muted);padding:7px}.rival-direction{color:#d9786d}.player-direction{color:#e1bd6e}
+.legend{display:grid;grid-template-columns:64px 1fr;grid-template-rows:auto 1fr auto;column-gap:10px;align-items:center}.legend-token{grid-row:1/4;width:62px;height:62px;border-radius:50%;position:relative;display:grid;place-items:center;background:radial-gradient(circle,#1a211f 32%,color-mix(in srgb,var(--suit) 42%,#151a18) 34% 54%,#080b0a 56%);border:3px double color-mix(in srgb,var(--suit) 78%,white);box-shadow:inset 0 0 10px #000,0 4px 12px #0008;transition:.3s}.legend-token::before{content:'';position:absolute;inset:6px;border:1px dotted color-mix(in srgb,var(--suit) 55%,white);border-radius:50%}.dial-pointer{width:3px;height:23px;background:linear-gradient(to top,#eee 0 58%,var(--suit) 60%);position:absolute;left:calc(50% - 1px);top:7px;transform-origin:50% 24px;filter:drop-shadow(0 1px 2px #000);transition:transform .35s ease}.dial-pointer::before{content:'';position:absolute;left:-4px;top:-2px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid var(--suit)}.legend-token.neutral .dial-pointer{transform:rotate(90deg)}.legend-token.ai .dial-pointer{transform:rotate(0deg)}.legend-token.player .dial-pointer{transform:rotate(180deg)}.dial-center{width:10px;height:10px;background:#d5ccb5;border:2px solid #282d29;border-radius:50%;z-index:2;box-shadow:0 1px 3px #000}.legend h3{grid-column:2;margin-top:0}.legend p{grid-column:2}.legend button{grid-column:2}.allegiance-status{display:block;margin-top:4px;color:color-mix(in srgb,var(--suit) 65%,white);font:700 9px system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+@media(min-width:1051px){.game-screen{display:grid;grid-template-columns:minmax(0,1fr) 270px;grid-template-areas:'top top' 'rival hall' 'cross hall' 'log hall' 'player hall' 'hand hall';column-gap:4px;align-content:start}.game-screen.hidden{display:none!important}.topbar{grid-area:top}.rival{grid-area:rival}.legends-wrap{grid-area:hall;position:sticky;top:70px;align-self:start;max-height:calc(100vh - 150px);overflow-y:auto;margin:14px 14px 20px 4px;padding:14px;background:#0d1211d9;border:1px solid var(--line);border-radius:7px;box-shadow:0 12px 28px #0007}.crossroads-wrap{grid-area:cross}.log{grid-area:log}.you{grid-area:player}.hand-wrap{grid-area:hand}.game-screen>.player-panel,.game-screen>.crossroads-wrap,.game-screen>.hand-wrap,.game-screen>.log{width:calc(100% - 28px);max-width:none;margin-left:14px;margin-right:14px}.legends{grid-template-columns:1fr;gap:9px}.legend{min-height:118px}.legends-wrap>.section-label{display:block;text-align:center;margin-bottom:3px}}
+@media(max-width:1050px){.hall-direction{display:none}.legend{grid-template-columns:58px 1fr}.legend-token{width:54px;height:54px}.dial-pointer{height:20px;transform-origin:50% 21px}}
+
+/* Two-sided Grendel coin token. Both faces share one sprite for a future flip. */
+.grendel-coin{width:58px;height:58px;perspective:500px;margin:4px auto 2px;flex:0 0 auto}.grendel-coin-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.7,.2,1)}.grendel-coin:hover .grendel-coin-inner,.grendel-coin:focus-within .grendel-coin-inner{transform:rotateY(180deg)}.grendel-coin-face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;background-image:url('assets/grendel-coin-faces.png');background-repeat:no-repeat;background-size:auto 100%;filter:drop-shadow(0 4px 5px #0009)}.grendel-coin-face.g-face{background-position:right center}.grendel-coin-face.griffin-face{background-position:left center;transform:rotateY(180deg)}.grendel-coin-caption{display:block;text-align:center;color:#d9b55f;font:700 8px system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase}.card.has-grendel-token .effect{margin-top:5px}.library-card .grendel-coin{width:64px;height:64px;margin:5px 0 8px}.library-card .grendel-coin-caption{text-align:left;margin-left:2px}
+.coin-copper .grendel-coin-face{background-image:url('assets/copper-coin-faces.png');background-size:209.3% 132.6%}
+.coin-copper .grendel-coin-face.g-face{background-position:97.5% 34%}
+.coin-copper .grendel-coin-face.griffin-face{background-position:2.3% 34%}
+.coin-silver .grendel-coin-face{background-image:url('assets/silver-coin-faces.png');background-size:213.7% 104.8%}
+.coin-silver .grendel-coin-face.g-face{background-position:96.5% 20%}
+.coin-silver .grendel-coin-face.griffin-face{background-position:2% 20%}

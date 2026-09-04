@@ -1,0 +1,20 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {build} from 'vite';
+import {sites} from '@openai/sites-vite-plugin';
+const root=path.dirname(fileURLToPath(import.meta.url));
+const out=path.join(root,'dist');
+// Only generated output under this project's dist is replaced.
+fs.rmSync(out,{recursive:true,force:true});
+fs.mkdirSync(path.join(out,'server'),{recursive:true});
+fs.mkdirSync(path.join(out,'client'),{recursive:true});
+const shim=`const node=()=>({children:[],dataset:{},style:{setProperty(){}},classList:{add(){},remove(){},toggle(){},contains(){return false}},append(){},prepend(){},replaceChildren(){},setAttribute(){},querySelector(){return node()},showModal(){},close(){}});const document={querySelector:()=>node(),querySelectorAll:()=>[],createElement:()=>node()};`;
+const sources=['game.js','crimson-deck.js','midnight-deck.js','server/engine-adapter.js'].map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n');
+fs.writeFileSync(path.join(out,'server/engine.js'),`export function createEngine(){\n${shim}\n${sources}\n}\n`);
+fs.mkdirSync(path.join(root,'.local'),{recursive:true});
+fs.writeFileSync(path.join(root,'.local/worker-entry.js'),fs.readFileSync(path.join(root,'server/worker.js'),'utf8').replace("'./engine.js'","'../dist/server/engine.js'"));
+await build({root,configFile:false,plugins:[sites()],build:{ssr:path.join(root,'.local/worker-entry.js'),outDir:path.join(out,'server'),emptyOutDir:false,rollupOptions:{output:{entryFileNames:'index.js'}}}});
+for(const file of fs.readdirSync(root))if(/\.(html|css|js)$/.test(file))fs.copyFileSync(path.join(root,file),path.join(out,'client',file));
+fs.cpSync(path.join(root,'assets'),path.join(out,'client/assets'),{recursive:true});
+console.log('Built shared rules, multiplayer server, and game assets.');

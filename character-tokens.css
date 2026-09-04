@@ -1,0 +1,33 @@
+.choice{border-color:var(--suit);text-align:center;background:radial-gradient(ellipse at top,color-mix(in srgb,var(--suit) 23%,#111716),#111716)}
+.choice .character-art{width:150px;height:150px;margin:auto auto 12px;display:block}
+.character-art{object-fit:contain;clip-path:circle(48% at 50% 50%);pointer-events:none}
+.choice.selected{box-shadow:0 0 22px color-mix(in srgb,var(--suit) 50%,transparent);outline:2px solid var(--suit)}
+.character-placard{isolation:isolate;grid-template-columns:92px minmax(0,1fr);padding:20px 16px 20px 8px;border:0;background:none;box-shadow:none!important;min-height:158px;column-gap:12px}
+.character-placard::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:var(--suit) url('assets/placard.png') center/100% 165% no-repeat;background-blend-mode:luminosity;border-radius:15px;opacity:.8}
+.character-placard h3{font-size:16px;text-shadow:0 2px 3px #000}
+.character-placard p{font-size:13px;color:#fff2dc;text-shadow:0 1px 3px #000}
+.character-placard button{font-size:12px;background:#141815e8;position:relative}
+.character-placard .character-token{grid-row:1/5;width:92px;height:92px;border:0;background:none;box-shadow:none;position:relative;overflow:visible}
+.character-token::before{display:none}
+.character-token>.character-art{width:100%;height:100%}
+.character-placard>.character-art{grid-column:1;grid-row:1/5;width:92px;height:92px}
+.character-lore{grid-column:2;color:#fff2dc;font:12px/1.4 system-ui;margin-top:6px}
+.character-lore summary{cursor:pointer}
+.edge-rotor{position:absolute;inset:0;transform-origin:50% 50%;pointer-events:none}
+/* Original arrow points northeast; turn it north and attach its concave base to the rim. */
+.edge-arrow{position:absolute;width:48%;height:48%;left:26%;top:-23%;transform:rotate(-45deg);pointer-events:none;clip-path:polygon(20% 35%,84% 17%,57% 79%,48% 72%,48% 60%,42% 53%,33% 49%,25% 49%);filter:drop-shadow(0 2px 2px #000)}
+@media(min-width:1051px){
+  .game-screen{grid-template-columns:minmax(0,1fr) clamp(380px,25vw,440px)}
+  .legends-wrap{width:100%;padding:8px;top:62px;margin-top:6px;max-height:calc(100dvh - 145px)}
+  .legends-wrap .legends{gap:5px}
+  .legends-wrap .character-placard{grid-template-columns:80px minmax(0,1fr);min-height:128px;padding:12px 14px 12px 8px;column-gap:10px}
+  .legends-wrap .character-token,.legends-wrap .character-placard>.character-art{width:80px;height:80px}
+  .legends-wrap .character-placard p{font-size:14px}
+  .legends-wrap .character-placard button{font-size:13px;padding:6px 8px}
+  .legends-wrap .character-placard h3{margin-bottom:3px}
+  .legends-wrap .character-placard p{margin-bottom:4px;line-height:1.25}
+  .legends-wrap .character-lore{margin-top:3px}
+  .legends-wrap .common-purse{position:sticky;bottom:0;z-index:3;background:#151b18;border-radius:10px;box-shadow:0 -6px 12px #0008!important}
+  .legends-wrap .hall-direction{margin:2px 0;padding:0}
+}
+@media(max-width:600px){.choice .character-art{width:125px;height:125px}.character-placard{grid-template-columns:72px minmax(0,1fr)}.character-placard .character-token,.character-placard>.character-art{width:72px;height:72px}.legends{grid-template-columns:1fr}}

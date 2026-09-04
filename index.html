@@ -6,49 +6,66 @@
   <title>Stories of Sacrifice — Prototype</title>
   <meta name="description" content="A playable prototype of the shared-market deck-building game Stories of Sacrifice.">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="suits.css?v=readable-costs-1">
+  <link rel="stylesheet" href="table-motion.css?v=artwork-card-back-1">
+  <link rel="stylesheet" href="character-tokens.css?v=roomier-hall-2">
+  <link rel="stylesheet" href="setup-box.css?v=centered-setup-1">
+  <link rel="stylesheet" href="crimson-deck.css?v=midnight-dialog-4">
+  <link rel="stylesheet" href="resource-icons.css?v=1">
 </head>
 <body>
   <div id="setup" class="screen setup-screen">
-    <div class="sigil">S</div>
+    <div class="setup-intro">
+    <div class="setup-intro-copy">
     <p class="eyebrow">A shared-market deck-building game</p>
-    <h1>Stories of Sacrifice</h1>
-    <p class="lede">Choose four Chronicles. Build your deck, court the Legends, and be the first to claim 40 Glory.</p>
-    <div id="chronicleChoices" class="chronicle-choices"></div>
+    <h1><img class="setup-logo" src="assets/stories-logo.png" width="1536" height="1024" alt="Stories of Sacrifice"></h1>
+    <p class="lede">Choose four Chronicles. Build your deck, court the Legends, and be the first to claim 40 Prestige.</p>
     <p id="selectionHelp" class="selection-help">Choose exactly four Chronicles.</p>
-    <button id="startGame" class="primary" disabled>Begin the Story</button>
+    <div class="setup-actions"><button id="startGame" class="primary" disabled>Begin the Story</button><button class="secondary card-library-button">View Card Library</button></div>
+    </div>
+    </div>
+    <div id="chronicleChoices" class="chronicle-choices"></div>
     <details class="rules">
       <summary>How to play</summary>
-      <p>Play cards from your hand to gain Gold and Might. Spend Gold to recruit cards from the Crossroads. Spend Might to defeat enemy Champions; leftover Might becomes Glory when your turn ends.</p>
-      <p>You may invoke one Legend each turn. A Legend facing you grants Allegiance. End a turn with all four Legends facing you for an immediate victory, or reach 40 Glory and survive the rival's final response.</p>
+      <p>Play cards from your hand to gain Grendels and Power. Spend Grendels to recruit cards from the Crossroads. Spend Power to defeat enemy Champions; leftover Power becomes Prestige when your turn ends.</p>
+      <p>Actions go directly to your Rest pile after resolving. Only Champions and Guards stay on the field.</p>
+      <p>After use, one-time-use cards rest until turn end, then return to the Crossroads stock. They cannot be drawn again that turn.</p>
+      <p>The Common Purse is always available in the Hall: pay 2 Grendels to replace a Copper in your Rest pile with a Silver worth 2 Grendels. It uses your Legend invocation and has no Allegiance dial.</p>
+      <p>You may invoke one Legend each turn. A Legend facing you grants Allegiance. End a turn with all four Legends facing you for an immediate victory, or reach 40 Prestige and survive the rival's final response.</p>
     </details>
+    <img class="game-box-art" src="assets/game-box.png" width="1254" height="1254" alt="Stories of Sacrifice black-and-gold game box">
   </div>
 
   <main id="game" class="screen game-screen hidden">
     <header class="topbar">
-      <div><span class="brand-mark">S</span><strong>Stories of Sacrifice</strong> <span class="prototype">Prototype</span></div>
-      <div class="top-actions"><button id="rulesButton" class="ghost">Rules</button><button id="newGame" class="ghost">New game</button></div>
+      <div class="game-brand"><img class="header-logo" src="assets/stories-logo.png" width="1536" height="1024" alt="Stories of Sacrifice"><span class="prototype">Prototype</span></div>
+      <div class="top-actions"><button class="ghost card-library-button">Card Library</button><button id="rulesButton" class="ghost">Rules</button><button id="newGame" class="ghost">New game</button></div>
     </header>
 
     <section id="aiPanel" class="player-panel rival"></section>
+    <section id="rivalCards" class="table-zone rival-cards" aria-label="Rival cards"></section>
     <section class="legends-wrap">
       <div class="section-label">The Hall of Legends</div>
+      <div class="hall-direction rival-direction">Rival</div>
       <div id="legends" class="legends"></div>
+      <div class="hall-direction player-direction">You</div>
     </section>
     <section class="crossroads-wrap">
-      <div class="section-heading"><div><span class="section-label">The Crossroads</span><small>Recruit with Gold</small></div><div id="turnBanner"></div></div>
+      <div class="section-heading"><div><span class="section-label">The Crossroads</span><small>Recruit with Grendels</small></div><div id="turnBanner"></div></div>
       <div id="market" class="market"></div>
     </section>
     <section id="log" class="log" aria-live="polite"></section>
+    <section id="playedCards" class="played-cards" aria-label="Cards played this turn"></section>
     <section id="playerPanel" class="player-panel you"></section>
     <section class="hand-wrap">
       <div class="section-heading"><div><span class="section-label">Your Hand</span><small>Click a card to play it</small></div><button id="playAll" class="secondary">Play all</button></div>
-      <div id="hand" class="hand"></div>
+      <div class="table-zone"><div id="playerDraw" class="pile"></div><div id="hand" class="hand"></div><div id="playerDiscard" class="pile"></div></div>
     </section>
     <footer class="turn-controls">
       <div class="resources">
-        <div><span>Gold</span><b id="gold">0</b></div>
-        <div><span>Might</span><b id="might">0</b></div>
-        <div><span>Glory</span><b id="glory">0</b></div>
+        <div class="resource-counter"><span>Grendels</span><b id="grendels">0</b><span class="resource-icon resource-grendel" aria-hidden="true"></span></div>
+        <div class="resource-counter"><span>Power</span><b id="power">0</b><span class="resource-icon resource-power" aria-hidden="true">&#x270A;&#xFE0E;</span></div>
+        <div class="resource-counter"><span>Prestige</span><b id="prestige">0</b><svg class="resource-icon resource-prestige" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M9 5h14l7 9-14 15L2 14Z" fill="#a5e6f3" stroke="#e5fbff" stroke-width="1.5"/><path d="m9 5 7 24 7-24M2 14h28M9 5l7 9 7-9" fill="none" stroke="#398da7" stroke-width="1.5"/></svg></div>
       </div>
       <button id="endTurn" class="primary">End turn</button>
     </footer>
@@ -58,17 +75,41 @@
     <button class="dialog-close" aria-label="Close">×</button>
     <h2>How the story unfolds</h2>
     <ol>
-      <li><strong>Play cards</strong> to generate Gold, Might, and special effects.</li>
-      <li><strong>Recruit cards</strong> from the shared Crossroads with Gold. They enter your Rest pile.</li>
-      <li><strong>Defeat rival Champions</strong> by paying Might equal to their durability. Guards must fall first.</li>
+      <li><strong>Play cards</strong> to generate Grendels, Power, and special effects.</li>
+      <li><strong>Recruit cards</strong> from the shared Crossroads with Grendels. They enter your Rest pile.</li>
+      <li><strong>Damage rival Champions</strong> with Power. Damage persists; red health numbers show wounded Champions. Guards must fall first.</li>
+      <li><strong>Champion Effects</strong> resolve automatically on placement. On later turns, click each Champion to use its Effect once.</li>
+      <li><strong>Crimson and Midnight combos:</strong> Combo unlocks on your second same-suit activation that turn; Combo 2 on your third, and Combo 3 on your fourth. Only the card being activated receives its printed bonuses—earlier cards never trigger again.</li>
+      <li><strong>Law in Effect</strong> plays immediately when purchased, then returns to the Crossroads stock instead of joining your deck. Its Combo 2 makes the opponent choose a card to discard at the start of their next turn.</li>
       <li><strong>Invoke one Legend</strong> per turn if you can pay its cost.</li>
-      <li><strong>End your turn.</strong> Leftover Might becomes Glory and you draw five new cards.</li>
+      <li><strong>End your turn.</strong> Leftover Power becomes Prestige and you draw five new cards.</li>
     </ol>
-    <p>Reach 40 Glory and remain ahead after the rival's response, or control all four Legends at the end of your turn.</p>
+    <p>Reach 40 Prestige and remain ahead after the rival's response, or control all four Legends at the end of your turn.</p>
+    <p>The always-neutral Common Purse lets you pay 2 Grendels and exchange a Copper in your Rest pile for a Silver worth 2 Grendels. This uses your Legend invocation. It does not count toward the four-dial victory.</p>
   </dialog>
   <dialog id="resultDialog">
     <div class="result-sigil">✦</div><h2 id="resultTitle"></h2><p id="resultText"></p><button id="resultRestart" class="primary">Write another story</button>
   </dialog>
-  <script src="game.js"></script>
+  <dialog id="cardLibraryDialog" class="library-dialog">
+    <div class="library-header"><div><p class="eyebrow">Game reference</p><h2>Card Library</h2><p>Every card currently available in the prototype.</p></div><button class="dialog-close" aria-label="Close card library">×</button></div>
+    <nav id="libraryFilters" class="library-filters" aria-label="Filter cards by Chronicle"></nav>
+    <div id="librarySummary" class="library-summary"></div>
+    <div id="libraryCards" class="library-cards"></div>
+  </dialog>
+  <dialog id="sacrificeDialog" aria-labelledby="sacrificeTitle">
+    <h2 id="sacrificeTitle">Seraphine — Choose a sacrifice</h2>
+    <p>Your Rest pile. Choose a card played this turn to permanently remove it from your deck and gain half its cost as Prestige, rounded up.</p>
+    <div id="sacrificeCards" style="display:grid;gap:10px"></div>
+    <form method="dialog"><button style="margin-top:16px">Cancel</button></form>
+  </dialog>
+  <script src="game.js?v=seraphine-choice-1"></script>
+  <dialog id="championTargetDialog" aria-labelledby="championTargetTitle"><h2 id="championTargetTitle">The Assassin — Choose a Champion</h2><p>Deal 2 damage to one opposing Champion.</p><div id="championTargets"></div></dialog>
+  <dialog id="lawDiscardDialog" aria-labelledby="lawDiscardTitle"><h2 id="lawDiscardTitle">Law in Effect — Discard from your hand</h2><p id="lawDiscardCount"></p><div id="lawDiscardCards" style="display:grid;gap:10px"></div></dialog>
+  <script src="crimson-deck.js?v=midnight-art-2"></script>
+  <script src="midnight-deck.js?v=1"></script>
+  <script src="table-motion.js?v=midnight-turns-2"></script>
+  <script src="character-tokens.js?v=1"></script>
+  <link rel="stylesheet" href="multiplayer.css">
+  <script src="multiplayer.js?v=1"></script>
 </body>
 </html>

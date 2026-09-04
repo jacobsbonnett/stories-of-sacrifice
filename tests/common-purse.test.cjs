@@ -1,0 +1,66 @@
+const fs=require('node:fs');
+const vm=require('node:vm');
+const assert=require('node:assert/strict');
+const path=require('node:path');
+const node=()=>({dataset:{},style:{setProperty(){}},classList:{add(){},remove(){}},append(){},querySelector:()=>node()});
+const context=vm.createContext({document:{querySelector:()=>node(),querySelectorAll:()=>[],createElement:()=>node()},crypto:require('node:crypto').webcrypto,console});
+vm.runInContext(fs.readFileSync(path.join(__dirname,'../game.js'),'utf8'),context);
+vm.runInContext('render=()=>{}; log=()=>{};',context);
+function run(code){return vm.runInContext(code,context);}
+function reset(){run("state.over=false;state.turn='player';state.invoked=false;state.chain={};state.legends={gilded:'player'};state.player={grendels:3,power:0,prestige:0,draw:[],champions:[],discard:[basic(),basic()],hand:[],played:[]};state.ai={grendels:2,power:0,prestige:0,draw:[],champions:[],discard:[basic()],hand:[],played:[]};");}
+reset();assert.equal(run('invokeCommonPurse()'),true);
+assert.equal(run('state.player.grendels'),1);
+assert.equal(run("state.player.discard.filter(c=>c.name==='Silver').length"),1);
+assert.equal(run("state.player.discard.filter(c=>c.name==='Copper').length"),1);
+assert.equal(run('state.player.discard[0].value'),2);
+assert.equal(run('state.invoked'),true);
+assert.equal(run("JSON.stringify(state.legends)"),'{"gilded":"player"}');
+assert.equal(run('invokeCommonPurse()'),false);
+reset();run('state.player.grendels=1');assert.equal(run('invokeCommonPurse()'),false);assert.equal(run('state.player.discard.length'),2);
+reset();run('state.player.hand=state.player.discard.splice(0)');assert.equal(run('invokeCommonPurse()'),false);assert.equal(run('state.player.grendels'),3);
+reset();run("state.turn='ai'");assert.equal(run('invokeCommonPurse()'),false);assert.equal(run('invokeCommonPurse(true)'),true);assert.equal(run('state.ai.grendels'),0);assert.equal(run('state.ai.discard[0].name'),'Silver');
+reset();run('state.over=true');assert.equal(run('invokeCommonPurse()'),false);
+console.log('Common Purse: exchange, cost, pile eligibility, turn limits, rival use, and neutral allegiance checks passed.');
+reset();run('state.player.grendels=0;state.player.discard=[];state.player.hand=[basic(),basic()];playCard(0);playCard(0)');
+assert.equal(run('state.player.grendels'),2);
+assert.equal(run('state.player.played.length'),0);
+assert.equal(run('state.player.discard.length'),2);
+assert.equal(run('invokeCommonPurse()'),true);
+assert.equal(run('state.player.grendels'),0);
+assert.equal(run("state.player.discard.filter(c=>c.name==='Silver').length"),1);
+reset();run("state.player.hand=[createCard(CHRONICLES.crimson.cards[0],'crimson')];playCard(0)");
+assert.equal(run('state.player.champions.length'),1);
+reset();run("state.player.discard=[];state.player.hand=[createCard(CHRONICLES.gilded.cards[0],'gilded')];playCard(0)");
+assert.equal(run("invoke('gilded')"),true);
+assert.equal(run('state.player.discard.length'),0);
+assert.equal(run('state.player.prestige'),2);
+reset();run('state.player.grendels=4');assert.equal(run("invoke('midnight')"),true);
+assert.equal(run('state.player.grendels'),0);assert.equal(run('state.player.power'),2);
+reset();run('invokeCommonPurse();state.player.grendels=4');assert.equal(run("invoke('midnight')"),false);
+assert.equal(run('state.player.grendels'),4);
+reset();run("state.turn='ai';state.ai.hand=[basic()];playCard(0,true)");
+assert.equal(run('state.ai.discard.length'),2);assert.equal(run('state.ai.played.length'),0);
+console.log('Immediate Rest: played Copper can be exchanged immediately; Guards persist; sacrifice removes its Rest card.');
+reset();run("state.marketDeck=[];state.player.discard=[];state.player.hand=[card('Test contract',2,'contract','common','grendels',2,'One-time use.')];playCard(0)");
+assert.equal(run('state.player.discard.length'),1);
+run('draw(state.player,5)');assert.equal(run('state.player.hand.length'),0);
+run('returnUsedContracts(state.player)');assert.equal(run('state.player.discard.length'),0);
+assert.equal(run('state.marketDeck.length'),1);assert.equal(run('state.marketDeck[0].returnToStock'),undefined);
+run('returnUsedContracts(state.player)');assert.equal(run('state.marketDeck.length'),1);
+console.log('One-time-use cards rest after use, cannot redraw, and return to stock exactly once.');
+const css=fs.readFileSync(path.join(__dirname,'../table-motion.css'),'utf8');
+// A small element model verifies hand identity and absence of unrelated mutations.
+function handModel(){return {children:[],mutations:0,insertBefore(el,next){this.mutations++;const prior=this.children.indexOf(el);if(prior>=0)this.children.splice(prior,1);const index=next?this.children.indexOf(next):this.children.length;this.children.splice(index,0,el);el.parent=this;}};}
+function makeElement(){return {dataset:{},remove(){this.parent.mutations++;this.parent.children.splice(this.parent.children.indexOf(this),1);}};}
+context.testHands=[handModel(),handModel()];context.makeElement=makeElement;
+run("syncHandCards(testHands[0],[{id:'p1'},{id:'p2'}],makeElement);syncHandCards(testHands[1],[{id:'a1'},{id:'a2'}],makeElement)");
+const playerNode=context.testHands[0].children[0],aiNode=context.testHands[1].children[0];
+context.testHands.forEach(h=>h.mutations=0);
+run("syncHandCards(testHands[0],[{id:'p1'}],makeElement);syncHandCards(testHands[1],[{id:'a1'},{id:'a2'}],makeElement)");
+assert.equal(context.testHands[1].mutations,0);assert.equal(context.testHands[1].children[0],aiNode);
+context.testHands.forEach(h=>h.mutations=0);
+run("syncHandCards(testHands[0],[{id:'p1'}],makeElement);syncHandCards(testHands[1],[{id:'a1'}],makeElement)");
+assert.equal(context.testHands[0].mutations,0);assert.equal(context.testHands[0].children[0],playerNode);
+console.log('Hand isolation: playing on either side preserves the other hand without element mutations.');
+assert.match(css,/\.pile-face\{position:relative\}/);
+assert.match(css,/\.card-back::before,\.card-back::after\{pointer-events:none\}/);

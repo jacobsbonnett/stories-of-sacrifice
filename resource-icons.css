@@ -1,0 +1,14 @@
+/* Icons sit beside the live number, so game updates never replace them. */
+.resources .resource-counter{position:relative;min-width:102px;padding-right:44px}
+.resource-counter>b{min-width:2ch;font-variant-numeric:tabular-nums}
+.resource-icon{position:absolute;right:9px;bottom:7px;width:28px;height:28px;pointer-events:none;filter:drop-shadow(0 2px 2px #0009)}
+.resource-grendel{border-radius:50%;background:url('assets/copper-coin-faces.png') 97.5% 34%/209.3% 132.6% no-repeat}
+.resource-power{color:#f05249;font:28px/28px 'Segoe UI Symbol','Noto Sans Symbols 2',sans-serif;text-align:center;text-shadow:0 1px 0 #8e211c}
+.resource-prestige{overflow:visible}
+@media(max-width:520px){
+  .resources{gap:5px}
+  .resources .resource-counter{min-width:72px;padding-left:7px;padding-right:29px}
+  .resource-icon{right:5px;bottom:8px;width:22px;height:22px}
+  .resource-power{font-size:22px;line-height:22px}
+  .turn-controls{flex-wrap:wrap}
+}

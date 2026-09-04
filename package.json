@@ -1,0 +1,17 @@
+{
+ "name": "stories-of-sacrifice",
+ "private": true,
+ "type": "module",
+ "scripts": {
+  "build": "node build.mjs",
+  "start": "node server/local.mjs",
+  "test:online": "node --test tests/multiplayer.test.mjs",
+  "db:generate": "drizzle-kit generate"
+ },
+ "devDependencies": {
+  "@openai/sites-vite-plugin": "^0.2.0",
+  "drizzle-kit": "0.31.4",
+  "drizzle-orm": "0.44.5",
+  "vite": "^8.2.2"
+ }
+}

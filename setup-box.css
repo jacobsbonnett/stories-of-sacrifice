@@ -1,0 +1,12 @@
+.setup-screen{padding-top:24px}
+.setup-logo{display:block;width:min(100%,360px);height:auto;border-radius:8px;margin:0 auto}
+.game-brand{display:flex;align-items:center;gap:8px;min-width:0}
+.header-logo{display:block;width:75px;height:50px;object-fit:contain;border:0;transform:none}
+@media(max-width:520px){.game-brand .prototype{display:none}.topbar{padding-left:10px;padding-right:10px}}
+.setup-intro{display:block;max-width:650px;margin:0 auto 26px;text-align:center}
+.game-box-art{display:block;width:min(100%,280px);height:auto;margin:24px auto 0;clip-path:polygon(14% 6%,72% 1.5%,86% 5%,85.5% 90%,26% 98%,14% 92%);pointer-events:none}
+.setup-intro h1{font-size:clamp(32px,5vw,58px);line-height:1.08;margin:10px 0 12px}
+.setup-intro .lede{font-size:16px;margin:0 0 12px}
+.setup-intro .selection-help{margin:12px 0}
+.setup-intro .setup-actions{display:flex;flex-wrap:wrap;gap:10px}
+@media(max-width:600px){.setup-intro .eyebrow{font-size:10px;letter-spacing:.1em}.setup-intro .lede{font-size:14px}.setup-intro .setup-actions button{font-size:12px;padding:10px}.setup-intro h1{font-size:30px}}
