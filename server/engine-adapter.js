@@ -19,6 +19,12 @@ openJudgeChoice=(kind,p,isAI,count,title,after=null)=>{
  state.choice={kind,cards:p.draw.splice(Math.max(0,p.draw.length-3)),selected:[],remaining:Math.min(3,p.draw.length||3),title,after};
  state.choice.remaining=state.choice.cards.length;return true;
 };
+openHoursChoice=(kind,p,isAI=false)=>{
+ const cards=kind==='hours-rewind'?hoursRewindCards(p):(isAI?state.player:state.ai).champions;
+ if(!cards.length)return false;
+ if(isAI){const c=[...cards].sort((a,b)=>(b.cost||0)-(a.cost||0))[0];if(kind==='hours-rewind'){p.discard.splice(p.discard.indexOf(c),1);p.hand.push(c);}else{c.suspendedTurns=1;c.ready=false;}return true;}
+ state.choice={kind};return true;
+};
 function swapSeats(){
  [state.player,state.ai]=[state.ai,state.player];
  const swap=x=>x==='player'?'ai':x==='ai'?'player':x;
@@ -56,6 +62,10 @@ function act(action){
   }else if(['judge-rest','judge-order'].includes(choice.kind)){
    const pool=choice.kind==='judge-rest'?state.player.discard:choice.cards,i=indexOf(pool,action.id);choice.selected.push(...pool.splice(i,1));choice.remaining--;
    if(choice.remaining===0||!pool.length){for(const c of [...choice.selected].reverse())state.player.draw.push(c);if(choice.after?.draw)draw(state.player,choice.after.draw);state.choice=null;}
+  }else if(choice.kind==='hours-rewind'){
+   const i=indexOf(state.player.discard,action.id),c=state.player.discard[i];if(!(state.player.playedThisTurn||[]).includes(c.id)||c.suit!=='hours'||c.type!=='action')throw new Error('Choose an Hours action played this turn.');state.player.hand.push(...state.player.discard.splice(i,1));state.choice=null;
+  }else if(choice.kind==='hours-suspend'){
+   const c=state.ai.champions[indexOf(state.ai.champions,action.id)];c.suspendedTurns=1;c.ready=false;state.choice=null;
   }
   return;
  }
@@ -68,6 +78,7 @@ function act(action){
   case 'exchange':if(!invokeCommonPurse())throw new Error('Exchange unavailable.');break;
   case 'end':{
    const p=state.player;p.prestige+=p.power;p.power=0;
+   p.champions.forEach(c=>{if(c.suspendedTurns)c.suspendedTurns=0;});
    if(checkWin('player'))return;
    returnUsedContracts(p);p.discard.push(...p.hand.splice(0),...p.played.splice(0));p.playedThisTurn=[];
    p.grendels=0;p.discount=0;draw(p,5);
