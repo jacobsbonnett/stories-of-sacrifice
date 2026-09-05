@@ -16,7 +16,7 @@ const GOLDEN_CARDS=[
 const goldenDefinition=c=>c.suit==='velvet'?GOLDEN_CARDS.find(r=>r[0]===c.name):null;
 Object.assign(CHRONICLES.velvet,{name:'The Golden Deceiver',legend:'Vaelis, Lord of Masks',color:'#d5a916',pitch:'Wager on coin flips, negotiate Paid Combos, and bend the cost of the Crossroads.',start:{name:'Street Urchin',effect:'grendels',value:1,text:'Effect: Gain 1 Grendel.'},cards:GOLDEN_CARDS.slice(1)});
 SUIT_COLORS.velvet='#d5a916';
-function goldenFlip(p){const result=p.forcedFlip||((Math.random()<.5)?'heads':'tails');p.forcedFlip=null;p.lastFlip=result;return result;}
+function goldenFlip(p){const result=p.forcedFlip||((Math.random()<.5)?'heads':'tails');p.forcedFlip=null;p.lastFlip=result;p.flipSerial=(p.flipSerial||0)+1;return result;}
 const PAID_GOLDEN={"Fool's Gold":{cost:2,kind:'power',value:4},'Loaded Dice':{cost:2,kind:'draw',value:1},'Sleight of Hand':{cost:1,kind:'power',value:2},'Shady Deal':{cost:2,kind:'power',value:3},'Hidden Ace':{cost:2,kind:'draw',value:1}};
 function resolveGoldenChoice(value){
  const q=pendingCardChoice;if(!q||!['golden-paid','golden-discard','vaelis-flip'].includes(q.kind))return false;const p=q.isAI?state.ai:state.player;

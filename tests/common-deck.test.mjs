@@ -14,6 +14,14 @@ test('the new Common Purse stock replaces all placeholder commons and has approv
  assert.ok(!commons.some(c=>['Open Market','Traveling Broker','Call in a Favor','Public Bounty','Copper','Silver'].includes(c.name)));
  for(const slug of ['butcher','blacksmith','sword-with-the-red-hilt','sword-of-the-strange-hangings','smuggler','excalibur','strings-of-fate','weaver','copper-grendel','silver-grendel'])assert.ok(fs.statSync(new URL('../assets/common/'+slug+'.png',import.meta.url)).size>0);
 });
+test('Crossroads Common Purse cards quick-use on purchase and return to stock',()=>{
+ let s=setup();let c=card(s,'Excalibur');s.player.grendels=5;s.market=[c];
+ s=createEngine().move(s,0,{type:'buy',id:c.id});
+ assert.equal(s.player.power,4);assert.ok(!s.player.discard.some(x=>x.id===c.id));assert.ok(!s.player.hand.some(x=>x.id===c.id));assert.ok([...s.market,...s.marketDeck].some(x=>x.id===c.id));
+ s=setup();c=card(s,'Blacksmith');s.player.grendels=1;s.market=[c,...s.market.slice(0,4)];
+ s=createEngine().move(s,0,{type:'buy',id:c.id});assert.equal(s.choice.kind,'blacksmith');assert.equal(s.market.length,5);assert.ok(!s.player.discard.some(x=>x.id===c.id));
+ const target=s.market[0].id;s=createEngine().move(s,0,{type:'choose',id:target});assert.equal(s.choice,null);assert.ok(!s.market.some(x=>x.id===target));
+});
 for(const seat of [0,1])test(`multiplayer seat ${seat}: direct Power and draw cards`,()=>{
  let s=setup(),p=seat?s.ai:s.player;copperDraw(s,p);
  let c=card(s,'Sword of the Strange Hangings');s=play(s,seat,c);p=seat?s.ai:s.player;assert.equal(p.power,3);assert.ok(p.discard.some(x=>x.id===c.id));

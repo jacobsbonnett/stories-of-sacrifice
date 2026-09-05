@@ -54,7 +54,20 @@ function playCard(i,isAI=false){
   if(!isAI){log(`You played ${c.name}.`);render();}
 }
 function activateChampion(i,isAI=false){const p=isAI?state.ai:state.player,c=p.champions[i];if(!c||!c.ready)return;c.ready=false;apply(p,c,isAI);if(!isAI){log(`${c.name} answers your call.`);render()}}
-function buy(i,isAI=false){const p=isAI?state.ai:state.player,c=state.market[i];if(!c)return false;const cost=Math.max(0,c.cost-p.discount);if(p.grendels<cost)return false;p.grendels-=cost;p.discount=0;p.discard.push(c);state.market.splice(i,1);refill();if(!isAI){log(`You recruited ${c.name}.`);render()}return true}
+function buy(i,isAI=false){
+ const p=isAI?state.ai:state.player,c=state.market[i];if(!c)return false;
+ const cost=Math.max(0,c.cost-p.discount);if(p.grendels<cost)return false;
+ p.grendels-=cost;p.discount=0;state.market.splice(i,1);
+ const quickUse=typeof commonDefinition==='function'&&!!commonDefinition(c);
+ if(quickUse){
+  // Crossroads Common Purse cards resolve on purchase, then immediately return
+  // to the shared stock instead of entering either player's deck.
+  state.marketDeck.push(c);shuffle(state.marketDeck);refill();apply(p,c,isAI);
+  if(typeof pendingCardChoice!=='undefined'&&pendingCardChoice&&!isAI&&typeof showCommonChoice==='function')showCommonChoice();
+ }else{p.discard.push(c);refill();}
+ if(!isAI){log(quickUse?`You used ${c.name}. It returned to the Common Purse pool.`:`You recruited ${c.name} to your Rest pile. Its Effect will activate only after you draw and play it.`);render();}
+ return true;
+}
 function attackChampion(i){const c=state.ai.champions[i];if(!c)return;const guards=state.ai.champions.filter(x=>x.type==='guard');if(guards.length&&c.type!=='guard'){log('A Guard protects that Champion.');return}if(state.player.power<c.durability){log(`You need ${c.durability} Power to defeat ${c.name}.`);return}state.player.power-=c.durability;state.ai.discard.push(...state.ai.champions.splice(i,1));log(`You defeated ${c.name}.`);render()}
 function invoke(k,isAI=false){const p=isAI?state.ai:state.player,foe=isAI?state.player:state.ai;if(state.invoked)return false;let paid=false;if(k==='gilded'&&p.played.length){const c=p.played.sort((a,b)=>b.cost-a.cost)[0],ix=p.played.indexOf(c);p.played.splice(ix,1);p.prestige+=Math.ceil(c.cost/2);paid=true}else if(k==='midnight'&&p.grendels>=3){p.power+=Math.ceil(p.grendels/2);p.grendels=0;paid=true}else if(k==='hours'&&p.grendels>=4&&foe.champions.length){p.grendels-=4;foe.discard.push(foe.champions.shift());paid=true}else if(k==='crimson'&&p.power>=2){p.power-=2;const ix=p.discard.findIndex(x=>x.type==='champion'||x.type==='guard');if(ix>=0)p.hand.push(...p.discard.splice(ix,1));else p.power+=1;paid=true}else if(k==='velvet'&&p.grendels>=3){p.grendels-=3;if(state.legends[k]===(isAI?'ai':'player'))foe.discard.push(doubt());else foe.prestige=Math.max(0,foe.prestige-1);paid=true}else if(k==='ashen'&&p.power>=2&&p.played.length){p.power-=2;p.played.shift();draw(p);paid=true}if(paid){state.legends[k]=state.legends[k]===(isAI?'ai':'player')?null:(isAI?'ai':'player');state.invoked=true;if(!isAI){log(`You invoked ${CHRONICLES[k].legend}.`);render()}}return paid}
 function endTurn(){if(state.turn!=='player'||state.over)return;state.player.prestige+=state.player.power;state.player.power=0;cleanup(state.player);if(checkWin('player'))return;state.turn='ai';render();log('The Rival considers the Crossroads…');setTimeout(aiTurn,650)}

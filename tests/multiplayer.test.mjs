@@ -42,7 +42,7 @@ test('turn authority, end turn, no automatic opponent, and manual Champion effec
  assert.throws(()=>createEngine().move(s,0,{type:'end'}),/turn/);
 });
 test('purchase goes to the purchaser Rest and opponents cannot spend it',()=>{
- let s=setup();s.turn='ai';s.ai.grendels=99;const c=s.market.find(c=>c.name!=='Law in Effect');s=createEngine().move(s,1,{type:'buy',id:c.id});assert.ok(s.ai.discard.some(x=>x.id===c.id));assert.ok(!s.player.discard.some(x=>x.id===c.id));
+ let s=setup();s.turn='ai';s.ai.grendels=99;const c=s.market.find(c=>c.suit!=='common'&&c.name!=='Law in Effect')||s.marketDeck.find(c=>c.suit!=='common'&&c.name!=='Law in Effect');if(!s.market.some(x=>x.id===c.id))s.market=[c,...s.market.slice(1)];s=createEngine().move(s,1,{type:'buy',id:c.id});assert.ok(s.ai.discard.some(x=>x.id===c.id));assert.ok(!s.player.discard.some(x=>x.id===c.id));
  assert.throws(()=>createEngine().move(s,1,{type:'invoke',key:'not-a-deck'}));
 });
 test('all serialized target choices work for both players',()=>{

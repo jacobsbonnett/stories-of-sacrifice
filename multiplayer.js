@@ -72,7 +72,9 @@ async function sendOnline(action){
  online.busy=true;const body={action,revision:online.revision,requestId:crypto.randomUUID()};
  try{
   let data;try{data=await api(`/api/rooms/${online.room}/actions`,body);}catch(error){if(error.status)throw error;data=await api(`/api/rooms/${online.room}/actions`,body);}
-  acceptOnline(data);return true;
+  // Release the input lock before rendering a follow-up choice. This lets a
+  // player immediately answer Vaelis, Paid Combo, and target prompts.
+  online.busy=false;acceptOnline(data);return true;
  }catch(error){setStatus(error.message);try{const data=await api(`/api/rooms/${online.room}`);acceptOnline(data);setStatus(error.message);}catch{}return false;}
  finally{online.busy=false;}
 }
