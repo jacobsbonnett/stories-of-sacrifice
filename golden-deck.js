@@ -20,9 +20,10 @@ function goldenFlip(p){const result=p.forcedFlip||((Math.random()<.5)?'heads':'t
 const PAID_GOLDEN={"Fool's Gold":{cost:2,kind:'power',value:4},'Loaded Dice':{cost:2,kind:'draw',value:1},'Sleight of Hand':{cost:1,kind:'power',value:2},'Shady Deal':{cost:2,kind:'power',value:3},'Hidden Ace':{cost:2,kind:'draw',value:1}};
 function resolveGoldenChoice(value){
  const q=pendingCardChoice;if(!q||!['golden-paid','golden-discard','vaelis-flip'].includes(q.kind))return false;const p=q.isAI?state.ai:state.player;
+ if(q.kind==='vaelis-flip'&&!['heads','tails'].includes(value))return false;
  if(q.kind==='golden-paid'&&value==='pay'){if(p.grendels<q.effect.cost)return false;p.grendels-=q.effect.cost;q.effect.kind==='power'?p.power+=q.effect.value:draw(p,q.effect.value);}
  else if(q.kind==='golden-discard'){const i=p.hand.findIndex(c=>c.id===value);if(i<0)return false;p.discard.push(...p.hand.splice(i,1));}
- else if(q.kind==='vaelis-flip'){if(!['heads','tails'].includes(value))return false;p.forcedFlip=value;}
+ else if(q.kind==='vaelis-flip')p.forcedFlip=value;
  const done=q.resolve;pendingCardChoice=null;const d=$('#goldenChoiceDialog');if(d?.open)d.close();render();if(done)done();return true;
 }
 function showGoldenChoice(){
@@ -32,9 +33,10 @@ function showGoldenChoice(){
  for(const id of ['commonChoiceDialog','judgeChoiceDialog']){const other=$(`#${id}`);if(other?.open)other.close();}
  if(!d){d=document.createElement('dialog');d.id='goldenChoiceDialog';d.innerHTML='<h2></h2><img class="golden-choice-card" alt=""><p></p><div class="golden-choice-actions"></div>';document.body.append(d);d.oncancel=e=>e.preventDefault();}
  const title=d.querySelector('h2'),img=d.querySelector('img'),text=d.querySelector('p'),actions=d.querySelector('div');actions.replaceChildren();
- if(q.kind==='golden-paid'){title.textContent=`${q.card.name} — Paid Combo`;img.hidden=false;img.src=cardArtwork(q.card);text.textContent=`${q.card.text} Pay ${q.effect.cost} Grendel${q.effect.cost===1?'':'s'} for the Paid Combo?`;for(const [label,value] of [['Pay','pay'],['Decline','decline']]){const b=document.createElement('button');b.textContent=label;b.onclick=()=>resolveGoldenChoice(value);actions.append(b);}}
- else if(q.kind==='golden-discard'){title.textContent='The Gambler — Tails';img.hidden=false;img.src=cardArtwork(q.card);text.textContent=`${q.card.text} Choose 1 card from your hand to discard.`;for(const c of state.player.hand){const b=document.createElement('button');b.textContent=`${c.name} — ${c.text}`;b.onclick=()=>resolveGoldenChoice(c.id);actions.append(b);}}
- else{title.textContent='Vaelis — Choose the next coin flip';img.hidden=true;text.textContent='This hidden choice applies to your next coin flip this turn.';for(const value of ['heads','tails']){const b=document.createElement('button');b.textContent=value[0].toUpperCase()+value.slice(1);b.onclick=()=>resolveGoldenChoice(value);actions.append(b);}}
+ if(q.kind==='golden-paid'){title.textContent=`${q.card.name} — Paid Combo`;img.hidden=false;img.src=cardArtwork(q.card);text.textContent=`${q.card.text} Pay ${q.effect.cost} Grendel${q.effect.cost===1?'':'s'} for the Paid Combo?`;for(const [label,value] of [['Pay','pay'],['Decline','decline']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.goldenChoice=value;actions.append(b);}}
+ else if(q.kind==='golden-discard'){title.textContent='The Gambler — Tails';img.hidden=false;img.src=cardArtwork(q.card);text.textContent=`${q.card.text} Choose 1 card from your hand to discard.`;for(const c of state.player.hand){const b=document.createElement('button');b.type='button';b.textContent=`${c.name} — ${c.text}`;b.dataset.goldenChoice=c.id;actions.append(b);}}
+ else{title.textContent='Vaelis — Choose the next coin flip';img.hidden=true;img.removeAttribute('src');text.textContent="This is Vaelis's Legend ability, not the played card's Effect. Choose the result of your next coin flip this turn.";for(const value of ['heads','tails']){const b=document.createElement('button');b.type='button';b.textContent=value[0].toUpperCase()+value.slice(1);b.dataset.goldenChoice=value;actions.append(b);}}
+ actions.onclick=e=>{const button=e.target.closest?.('[data-golden-choice]');if(button){e.preventDefault();e.stopPropagation();resolveGoldenChoice(button.dataset.goldenChoice);}};
  if(!d.open)d.showModal();
 }
 function openGoldenChoice(kind,card,isAI=false,effect=null){

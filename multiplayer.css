@@ -7,9 +7,10 @@
 #onlineChoice{max-width:660px;width:90vw;max-height:85vh;overflow:auto}#onlineChoiceList{display:grid;gap:10px}#onlineChoiceList button{text-align:left;padding:15px}
 .online-paid-preview{display:block;width:min(42vw,300px);max-height:52vh;object-fit:contain;margin:8px auto;border-radius:12px}
 #onlineChoiceList:has(.online-choice-card){grid-template-columns:repeat(auto-fill,minmax(155px,1fr));align-items:start}
-#onlineChoiceList .online-choice-card,.judge-choice-card{display:flex;flex-direction:column;gap:7px;padding:8px;text-align:left;min-width:0;background:#151c1a;border:1px solid #76643e;border-radius:9px;color:#eee4c9}
-.online-choice-card img,.judge-choice-card img{display:block;width:100%;aspect-ratio:1060/1488;object-fit:cover;border-radius:6px;box-shadow:0 5px 15px #0009}
-.online-choice-card strong,.judge-choice-card strong{font:700 16px Georgia,serif;color:#f1d27b}.online-choice-card span,.judge-choice-card span{font:13px/1.35 system-ui,sans-serif;color:#d7cfb8}
+#onlineChoiceList .online-choice-card,.judge-choice-card,.common-choice-card{display:flex;flex-direction:column;gap:7px;padding:8px;text-align:left;min-width:0;background:#151c1a;border:1px solid #76643e;border-radius:9px;color:#eee4c9}
+.online-choice-card img,.judge-choice-card img,.common-choice-card img{display:block;width:100%;aspect-ratio:1060/1488;object-fit:cover;border-radius:6px;box-shadow:0 5px 15px #0009}
+.online-choice-card strong,.judge-choice-card strong,.common-choice-card strong{font:700 16px Georgia,serif;color:#f1d27b}.online-choice-card span,.judge-choice-card span,.common-choice-card span{font:13px/1.35 system-ui,sans-serif;color:#d7cfb8}
 .judge-choice-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;max-height:65vh;overflow:auto;padding:3px}
+#commonChoiceDialog:has(.common-choice-card){width:min(900px,92vw);max-width:900px}.choice-list:has(.common-choice-card){display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;max-height:65vh;overflow:auto;padding:3px}
 #judgeChoiceDialog{width:min(900px,92vw);max-height:88vh;overflow:auto}
-@media(max-width:520px){#onlineChoiceList:has(.online-choice-card),.judge-choice-list{grid-template-columns:repeat(2,minmax(0,1fr))}.online-choice-card span,.judge-choice-card span{font-size:12px}}
+@media(max-width:520px){#onlineChoiceList:has(.online-choice-card),.judge-choice-list,.choice-list:has(.common-choice-card){grid-template-columns:repeat(2,minmax(0,1fr))}.online-choice-card span,.judge-choice-card span,.common-choice-card span{font-size:12px}}
