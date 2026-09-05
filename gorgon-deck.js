@@ -35,7 +35,8 @@ apply=function(p,c,isAI=false){
  if(c.effect==='power')p.power+=c.value;
  if(c.effect==='draw')draw(p,c.value);
  if(c.effect==='petrify')petrify();
- if(count>=2){
+ const hasCombo2=!['Asp','Stone Curse'].includes(c.name);
+ if(count>=2&&!(count>=3&&hasCombo2)){
   if(['Medusa',"Gorgon's Gaze",'Euryale','Stone Curse','Coiling Serpents'].includes(c.name))p.power+=2;
   if(['Garden of Stone','Stheno'].includes(c.name))petrify();
   if(["Serpent's Bite",'Hall of Statues'].includes(c.name))p.grendels++;

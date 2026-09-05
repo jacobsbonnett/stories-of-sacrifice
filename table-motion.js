@@ -77,7 +77,7 @@ aiTurn=async function(){
   }
   await playRivalEffects();
   while(!state.over){const options=state.market.map((c,i)=>({c,i})).filter(x=>x.c.cost<=state.ai.grendels+state.ai.discount).sort((a,b)=>b.c.cost-a.c.cost);if(!options.length)break;if(!buy(options[0].i,true))break;render();await pause(500);await playRivalEffects();}
-  for(const key of shuffle([...state.selected]))if(invoke(key,true)){render();await pause(500);break;}
+  for(const key of shuffle([...state.selected]))if(invoke(key,true)){render();await pause(500);if(state.invoked)break;}
   if(!state.invoked)invokeCommonPurse(true);
   while(state.ai.power>0&&state.player.champions.length){const guards=state.player.champions.some(c=>c.type==='guard');const index=state.player.champions.findIndex(c=>!guards||c.type==='guard');if(index<0)break;const target=state.player.champions[index],damage=Math.min(state.ai.power,target.durability);state.ai.power-=damage;if(typeof damageChampion==='function')damageChampion(state.player,target.id,damage);else{target.durability-=damage;if(!target.durability)state.player.discard.push(...state.player.champions.splice(index,1));}render();await pause(350);}
   state.ai.prestige+=state.ai.power;state.ai.power=0;if(checkWin('ai'))return;

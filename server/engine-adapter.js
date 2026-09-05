@@ -4,6 +4,21 @@ log=t=>{state.message=t.replace(/^You /,`${state.player?.name||'Player'} `);};
 finish=(who,message)=>{state.over=true;state.winner=who;state.message=message;};
 chooseAssassinTarget=()=>{if(state.ai.champions.length)state.choice={kind:'assassin'};};
 openSeraphineSacrifice=()=>{state.choice={kind:'sacrifice'};};
+openCommonChoice=(kind)=>{const cards=commonChoiceCards(kind,state.player,state.ai);if(cards.length)state.choice={kind,remaining:kind==='butcher'?2:1};};
+openGoldenChoice=(kind,card,isAI=false,effect=null)=>{
+ if(kind==='golden-paid'&&state.player.grendels<effect.cost)return;
+ if(kind==='golden-discard'&&!state.player.hand.length)return;
+ state.choice={kind,cardName:card?.name||null,cardText:card?.text||null,effect};
+};
+openJudgeChoice=(kind,p,isAI,count,title,after=null)=>{
+ if(kind==='judge-rest'){
+  if(!p.discard.length)return false;
+  state.choice={kind,remaining:Math.min(count,p.discard.length),selected:[],title,after};return true;
+ }
+ judgeFillTopThree(p);if(!p.draw.length)return false;
+ state.choice={kind,cards:p.draw.splice(Math.max(0,p.draw.length-3)),selected:[],remaining:Math.min(3,p.draw.length||3),title,after};
+ state.choice.remaining=state.choice.cards.length;return true;
+};
 function swapSeats(){
  [state.player,state.ai]=[state.ai,state.player];
  const swap=x=>x==='player'?'ai':x==='ai'?'player':x;
@@ -23,6 +38,24 @@ function act(action){
   }else if(choice.kind==='law-discard'){
    state.player.discard.push(...state.player.hand.splice(indexOf(state.player.hand,action.id),1));
    if(--choice.remaining===0||!state.player.hand.length)state.choice=null;
+  }else if(['butcher','red-hilt'].includes(choice.kind)){
+   if(action.done&&choice.kind==='butcher')state.choice=null;
+   else{const i=indexOf(state.ai.champions,action.id);state.ai.discard.push(...state.ai.champions.splice(i,1));if(choice.kind==='red-hilt'||--choice.remaining===0||!state.ai.champions.length)state.choice=null;}
+  }else if(choice.kind==='blacksmith'){
+   if(action.done)state.choice=null;
+   else{const i=indexOf(state.market,action.id);state.marketDeck.push(...state.market.splice(i,1));shuffle(state.marketDeck);refill();state.choice=null;}
+  }else if(choice.kind==='strings'){
+   let i=state.player.champions.findIndex(c=>c.id===action.id);
+   if(i>=0)state.player.champions.splice(i,1);else state.player.discard.splice(indexOf(state.player.discard,action.id),1);state.choice=null;
+  }else if(choice.kind==='golden-paid'){
+   if(action.accept){if(state.player.grendels<choice.effect.cost)throw new Error('Paid Combo is no longer affordable.');state.player.grendels-=choice.effect.cost;choice.effect.kind==='power'?state.player.power+=choice.effect.value:draw(state.player,choice.effect.value);}state.choice=null;
+  }else if(choice.kind==='golden-discard'){
+   state.player.discard.push(...state.player.hand.splice(indexOf(state.player.hand,action.id),1));state.choice=null;
+  }else if(choice.kind==='vaelis-flip'){
+   if(!['heads','tails'].includes(action.result))throw new Error('Choose Heads or Tails.');state.player.forcedFlip=action.result;state.choice=null;
+  }else if(['judge-rest','judge-order'].includes(choice.kind)){
+   const pool=choice.kind==='judge-rest'?state.player.discard:choice.cards,i=indexOf(pool,action.id);choice.selected.push(...pool.splice(i,1));choice.remaining--;
+   if(choice.remaining===0||!pool.length){for(const c of [...choice.selected].reverse())state.player.draw.push(c);if(choice.after?.draw)draw(state.player,choice.after.draw);state.choice=null;}
   }
   return;
  }
@@ -38,7 +71,9 @@ function act(action){
    if(checkWin('player'))return;
    returnUsedContracts(p);p.discard.push(...p.hand.splice(0),...p.played.splice(0));p.playedThisTurn=[];
    p.grendels=0;p.discount=0;draw(p,5);
+   p.forcedFlip=null;p.lastFlip=null;
    state.turn='ai';state.invoked=false;state.chain={};
+   state.player.extraInvocations=0;
    state.ai.champions.forEach(c=>c.ready=true);
    restPetrifiedVillagers(state.ai);
    const count=Math.min(state.ai.pendingDiscards||0,state.ai.hand.length);state.ai.pendingDiscards=0;
@@ -61,6 +96,7 @@ return {
   const backs=(cards,zone)=>cards.map((c,i)=>({id:`hidden-${zone}-${i}`,hidden:true}));
   state.player.draw=backs(state.player.draw,'own-draw');state.ai.draw=backs(state.ai.draw,'opponent-draw');state.ai.hand=backs(state.ai.hand,'opponent-hand');
   state.marketDeck=backs(state.marketDeck,'stock');
+  delete state.ai.forcedFlip;
   if(state.turn!=='player')state.choice=null;
   return structuredClone(state);
  }

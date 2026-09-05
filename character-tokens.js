@@ -5,7 +5,7 @@ const CHARACTER_TOKENS={
   hours:{name:'The Keeper of Hours',legend:'Chronarch Vaelor',asset:'hours',color:'#77caff',lore:'An ancient keeper entrusted with the passage of time. Vaelor watches countless possible futures through his enchanted hourglass, knowing that changing even one moment may demand a terrible price.'},
   gilded:{name:"The Gilded Gorgon — Gorgon's Curse",legend:'Medusa',asset:'gorgon',color:'#278b51',lore:'Petrify adds a new Petrified Villager to your opponent’s Rest pile. Medusa cleanses your own Rest pile: 4 Grendels when neutral, 3 when favoring you, or 5 when favoring your opponent.'},
   ashen:{name:'The Burning Judge',legend:'Anukar, Judge of Souls',asset:'judge',color:'#ed732e',lore:'Guardian of the passage between life and death. Anukar weighs every soul against the deeds of its lifetime, and neither wealth, title, nor deception can influence his judgment.'},
-  velvet:{name:'The Golden Deceiver',legend:'Vaelis, Lord of Masks',asset:'deceiver',color:'#e7bd39',lore:'A charming trickster who can become whatever his victim most wants to see. Vaelis rarely tells a complete lie; instead, he manipulates fragments of truth until others deceive themselves.'}
+  velvet:{name:'The Golden Deceiver',legend:'Vaelis, Lord of Masks',asset:'deceiver',color:'#e7bd39',lore:'Choose the result of your next coin flip this turn. Pay 3 Grendels when neutral, 2 when favoring you, or 4 when favoring your opponent.'}
 };
 for(const [key,character] of Object.entries(CHARACTER_TOKENS)){
   Object.assign(CHRONICLES[key],{name:character.name,legend:character.legend,color:character.color});

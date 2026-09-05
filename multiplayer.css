@@ -5,3 +5,4 @@
 .online-status{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:1000;background:#16221f;border:1px solid #ac8940;border-radius:6px;padding:8px 14px;max-width:80vw;font-size:13px;box-shadow:0 4px 18px #0008}
 .online-status button{margin-left:12px;padding:5px 9px}.online-status:empty{display:none}
 #onlineChoice{max-width:660px;width:90vw;max-height:85vh;overflow:auto}#onlineChoiceList{display:grid;gap:10px}#onlineChoiceList button{text-align:left;padding:15px}
+.online-paid-preview{display:block;width:min(42vw,300px);max-height:52vh;object-fit:contain;margin:8px auto;border-radius:12px}

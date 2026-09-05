@@ -17,9 +17,28 @@ async function api(path,body){
 }
 function showOnlineChoice(){
  const choice=state.choice;if(!choice||state.turn!=='player'){onlineChoice.close();return;}
- const cards=choice.kind==='assassin'?state.ai.champions:choice.kind==='sacrifice'?state.player.discard.filter(c=>(state.player.playedThisTurn||[]).includes(c.id)):state.player.hand;
- $('#onlineChoiceTitle').textContent=choice.kind==='assassin'?'The Assassin — deal 2 damage':choice.kind==='sacrifice'?'Seraphine — choose a sacrifice':`Law in Effect — discard ${choice.remaining} card(s)`;
- $('#onlineChoiceList').replaceChildren(...cards.map(c=>{const button=document.createElement('button');button.textContent=`${c.name} — ${choice.kind==='assassin'?`${c.durability} health`:choice.kind==='sacrifice'?`${Math.ceil(c.cost/2)} Prestige`:c.text}`;button.onclick=()=>sendOnline({type:'choose',id:c.id});return button;}));
+ const cards=choice.kind==='assassin'||['butcher','red-hilt'].includes(choice.kind)?state.ai.champions:choice.kind==='sacrifice'?state.player.discard.filter(c=>(state.player.playedThisTurn||[]).includes(c.id)):choice.kind==='blacksmith'?state.market:choice.kind==='strings'?[...state.player.champions,...state.player.discard]:choice.kind==='judge-rest'?state.player.discard:choice.kind==='judge-order'?choice.cards:state.player.hand;
+ const titles={assassin:'The Assassin — deal 2 damage',sacrifice:'Seraphine — choose a sacrifice',butcher:`Butcher — choose up to ${choice.remaining} Agent(s)`,'red-hilt':'Sword with the Red Hilt — choose a Champion',blacksmith:'Blacksmith — replace a Crossroads card',strings:'Strings of Fate — destroy one of your cards'};
+ if(choice.kind==='golden-paid')titles[choice.kind]=`${choice.cardName} — Paid Combo`;
+ if(choice.kind==='golden-discard')titles[choice.kind]='The Gambler — Tails: discard 1 card';
+ if(choice.kind==='vaelis-flip')titles[choice.kind]='Vaelis — choose your next coin flip';
+ if(choice.kind==='judge-rest')titles[choice.kind]=choice.title||'Anukar — choose from Rest';
+ if(choice.kind==='judge-order')titles[choice.kind]=choice.title||'Choose the next card to draw';
+ $('#onlineChoiceTitle').textContent=titles[choice.kind]||`Law in Effect — discard ${choice.remaining} card(s)`;
+ if(choice.kind==='golden-paid'){
+  const preview=document.createElement('img');preview.className='online-paid-preview';preview.src=cardArtwork({name:choice.cardName,suit:'velvet'});preview.alt=choice.cardName;
+  const rules=document.createElement('p');rules.textContent=choice.cardText;
+  const pay=document.createElement('button');pay.textContent=`Pay ${choice.effect.cost} Grendel${choice.effect.cost===1?'':'s'}`;pay.onclick=()=>sendOnline({type:'choose',accept:true});
+  const decline=document.createElement('button');decline.textContent='Decline';decline.onclick=()=>sendOnline({type:'choose',accept:false});
+  $('#onlineChoiceList').replaceChildren(preview,rules,pay,decline);if(!onlineChoice.open)onlineChoice.showModal();return;
+ }
+ if(choice.kind==='vaelis-flip'){
+  const buttons=['heads','tails'].map(result=>{const b=document.createElement('button');b.textContent=result[0].toUpperCase()+result.slice(1);b.onclick=()=>sendOnline({type:'choose',result});return b;});
+  $('#onlineChoiceList').replaceChildren(...buttons);if(!onlineChoice.open)onlineChoice.showModal();return;
+ }
+ const buttons=cards.map(c=>{const button=document.createElement('button');button.textContent=`${c.name} — ${['assassin','butcher','red-hilt'].includes(choice.kind)?`${c.durability} health`:choice.kind==='sacrifice'?`${Math.ceil(c.cost/2)} Prestige`:c.text}`;button.onclick=()=>sendOnline({type:'choose',id:c.id});return button;});
+ if(['butcher','blacksmith'].includes(choice.kind)){const done=document.createElement('button');done.textContent='Done';done.onclick=()=>sendOnline({type:'choose',done:true});buttons.push(done);}
+ $('#onlineChoiceList').replaceChildren(...buttons);
  if(!onlineChoice.open)onlineChoice.showModal();
 }
 function acceptOnline(data){

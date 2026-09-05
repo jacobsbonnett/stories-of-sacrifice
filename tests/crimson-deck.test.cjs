@@ -19,7 +19,7 @@ const expected=[['Barricade',0,1],['City Gates',1,2],['King’s Army',2,3],['Her
 for(const [name,coins,power] of expected){run(`reset();state.chain.crimson=1;state.player.hand=[cc(${JSON.stringify(name)})];playCard(0);`);assert.equal(run('state.player.grendels'),coins,name);assert.equal(run('state.player.power'),power,name);}
 run(`reset();state.player.draw=[basic(),basic(),basic()];state.player.hand=[cc('Barricade'),cc('Hero’s Call'),cc('City Gates')];playCard(0);playCard(0);playCard(0);`);
 assert.equal(run('state.player.hand.length'),0,'No retroactive Combo 2');
-run(`state.player.hand=[cc('Hero’s Call')];playCard(0)`);assert.equal(run('state.player.hand.length'),1,'Third or later draws');
+run(`reset();state.player.draw=[basic()];state.chain.crimson=3;state.player.hand=[cc('Hero’s Call')];playCard(0)`);assert.equal(run('state.player.hand.length'),1,'Third or later draws');assert.equal(run('state.player.power'),0,'Combo 2 replaces the lower Combo tier');
 run(`reset();state.player.draw=[basic(),basic()];state.chain.crimson=1;state.player.hand=[cc('Muster')];playCard(0)`);assert.equal(run('state.player.hand.length'),2);
 run(`reset();state.player.hand=[cc('Galahad')];playCard(0);activateChampion(0)`);assert.equal(run('state.player.power'),3,'Placement once');
 run(`damageChampion(state.player,state.player.champions[0].id,3);state.player.champions[0].ready=true;state.chain.crimson=1;activateChampion(0)`);assert.equal(run('state.player.champions[0].durability'),4);

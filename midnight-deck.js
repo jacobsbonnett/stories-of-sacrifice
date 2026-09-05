@@ -24,11 +24,13 @@ apply=function(p,c,isAI=false){
  if(c.effect==='grendels')p.grendels+=c.value;
  if(c.effect==='power')p.power+=c.value;
  if(c.effect==='draw')draw(p,c.value);
- if(count>=2){
+ const hasCombo2=['Eagles Nest','Lions Pride',"Monkey's Deceit",'Sweeping Seagull','Hyena Screech','Bears Decree','Wolf Pack','Racoons Horde','Law in Effect'].includes(c.name);
+ const hasCombo3=['Sweeping Seagull','Watering Hole','Hyena Screech'].includes(c.name);
+ if(count>=2&&!(count>=3&&hasCombo2)&&!(count>=4&&hasCombo3)){
   if(['Wolf Pack','Talon'].includes(c.name)){p.grendels+=2;p.power+=2;}
   if(['Watering Hole','Carnivorous Cat','Racoons Horde'].includes(c.name))draw(p,1);
  }
- if(count>=3){
+ if(count>=3&&!(count>=4&&hasCombo3)){
   if(['Eagles Nest','Lions Pride',"Monkey's Deceit",'Sweeping Seagull','Hyena Screech'].includes(c.name))draw(p,1);
   if(c.name==='Bears Decree'){p.grendels+=2;p.power+=2;}
   if(c.name==='Wolf Pack')p.power+=2;

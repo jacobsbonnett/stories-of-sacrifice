@@ -19,17 +19,17 @@ function action(s,seat,a,mode){if(mode==='online')return createEngine().move(s,s
 // Scaling cases begin with five Villagers in the enemy draw/rest and one in hand (excluded).
 const cases=[
  ['Asp',0,0,[[1,0,0,0],[1,0,0,0],[1,0,0,0]]],
- ['Medusa',8,4,[[0,0,0,1],[0,2,0,1],[0,8,0,1]]],
- ["Gorgon's Gaze",6,0,[[0,0,0,1],[0,2,0,1],[0,2,0,2]]],
- ['Garden of Stone',6,0,[[2,0,0,0],[2,0,0,1],[2,3,0,1]]],
- ['Stheno',6,4,[[0,2,0,0],[0,2,0,1],[0,4,0,1]]],
- ['Euryale',5,3,[[1,0,0,0],[1,2,0,0],[1,2,0,1]]],
- ["Serpent's Bite",5,0,[[0,3,0,0],[1,3,0,0],[1,5,0,0]]],
+ ['Medusa',8,4,[[0,0,0,1],[0,2,0,1],[0,6,0,1]]],
+ ["Gorgon's Gaze",6,0,[[0,0,0,1],[0,2,0,1],[0,0,0,2]]],
+ ['Garden of Stone',6,0,[[2,0,0,0],[2,0,0,1],[2,3,0,0]]],
+ ['Stheno',6,4,[[0,2,0,0],[0,2,0,1],[0,4,0,0]]],
+ ['Euryale',5,3,[[1,0,0,0],[1,2,0,0],[1,0,0,1]]],
+ ["Serpent's Bite",5,0,[[0,3,0,0],[1,3,0,0],[0,5,0,0]]],
  ['Stone Curse',4,0,[[0,0,0,1],[0,2,0,1],[0,2,0,1]]],
- ["Gorgon's Lair",4,0,[[2,0,0,0],[2,1,0,0],[2,1,1,0]]],
- ['Coiling Serpents',4,0,[[1,0,0,0],[1,2,0,0],[1,2,0,1]]],
- ['Hall of Statues',3,0,[[0,1,0,0],[1,1,0,0],[1,2,0,0]]],
- ['Cursed Reflection',3,0,[[0,0,1,0],[0,1,1,0],[0,1,1,1]]]
+ ["Gorgon's Lair",4,0,[[2,0,0,0],[2,1,0,0],[2,0,1,0]]],
+ ['Coiling Serpents',4,0,[[1,0,0,0],[1,2,0,0],[1,0,0,1]]],
+ ['Hall of Statues',3,0,[[0,1,0,0],[1,1,0,0],[0,2,0,0]]],
+ ['Cursed Reflection',3,0,[[0,0,1,0],[0,1,1,0],[0,0,1,1]]]
 ];
 for(const mode of ['solo','online'])for(const seat of [0,1])for(const [name,cost,hp,levels] of cases)test(`${mode}, seat ${seat}: ${name} at every combo level`,()=>{
  for(let prior=0;prior<4;prior++){

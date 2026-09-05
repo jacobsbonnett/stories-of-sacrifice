@@ -10,7 +10,7 @@ fs.rmSync(out,{recursive:true,force:true});
 fs.mkdirSync(path.join(out,'server'),{recursive:true});
 fs.mkdirSync(path.join(out,'client'),{recursive:true});
 const shim=`const node=()=>({children:[],dataset:{},style:{setProperty(){}},classList:{add(){},remove(){},toggle(){},contains(){return false}},append(){},prepend(){},replaceChildren(){},setAttribute(){},querySelector(){return node()},showModal(){},close(){}});const document={querySelector:()=>node(),querySelectorAll:()=>[],createElement:()=>node()};`;
-const sources=['game.js','crimson-deck.js','midnight-deck.js','gorgon-deck.js','server/engine-adapter.js'].map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n');
+const sources=['game.js','crimson-deck.js','midnight-deck.js','gorgon-deck.js','common-deck.js','golden-deck.js','judge-deck.js','server/engine-adapter.js'].map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n');
 fs.writeFileSync(path.join(out,'server/engine.js'),`export function createEngine(){\n${shim}\n${sources}\n}\n`);
 fs.mkdirSync(path.join(root,'.local'),{recursive:true});
 fs.writeFileSync(path.join(root,'.local/worker-entry.js'),fs.readFileSync(path.join(root,'server/worker.js'),'utf8').replace("'./engine.js'","'../dist/server/engine.js'"));

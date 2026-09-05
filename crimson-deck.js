@@ -51,7 +51,7 @@ apply=function(p,c,isAI=false){
   if(c.effect==='power')p.power+=c.value;
   if(c.effect==='grendels')p.grendels+=c.value;
   // Only this activation's bonuses resolve. Prior cards are never revisited.
-  if(count>=2){
+  if(count>=2&&!(count>=3&&c.name==='Hero’s Call')){
     if(['City Gates','Battering Rams','Catapult'].includes(c.name))p.grendels++;
     if(c.name==='King’s Army')p.power+=3;
     if(c.name==='Hero’s Call')p.power+=2;

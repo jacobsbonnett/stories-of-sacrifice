@@ -22,7 +22,7 @@ const state={selected:[],market:[],marketDeck:[],turn:'player',over:false,invoke
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 function card(name,cost,type,suit,effect,value,text,durability=0){return{id:crypto.randomUUID(),name,cost,type,suit,effect,value,text,durability,ready:true}}
 function createCard(raw,suit){return card(raw[0],raw[1],raw[2],suit,raw[3],raw[4],raw[5],raw[6]||0)}
-function basic(name='Copper'){return card(name,0,'action','common','grendels',name==='Copper'?1:2,`+${name==='Copper'?1:2} Grendels.`)}
+function basic(name='Copper'){const copper=['Copper','Copper Grendel'].includes(name);return card(copper?'Copper':'Silver',0,'action','common','grendels',copper?1:2,`Effect: Gain ${copper?1:2} Grendel${copper?'':'s'}.`)}
 function doubt(){return card('Doubt',0,'burden','velvet','none',0,'No effect. A costly seed of uncertainty.')}
 function canPlayCard(c){return !!c&&!c.hidden&&!(c.suit==='gilded'&&c.type==='token'&&c.name==='Petrified Villager');}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -36,7 +36,7 @@ function returnUsedContracts(p){
 }
 function setupChoices(){const box=$('#chronicleChoices');Object.entries(CHRONICLES).forEach(([k,c])=>{const d=document.createElement('div');d.className='choice';d.dataset.key=k;d.innerHTML=`<span class="check">◆</span><span class="eyebrow">${c.legend}</span><h3>${c.name}</h3><p>${c.pitch}</p>`;d.onclick=()=>toggleChoice(k,d);box.append(d)})}
 function toggleChoice(k,el){if(state.selected.includes(k)){state.selected=state.selected.filter(x=>x!==k);el.classList.remove('selected')}else if(state.selected.length<4){state.selected.push(k);el.classList.add('selected')}$('#selectionHelp').textContent=`${state.selected.length} of 4 Chronicles chosen.`;$('#startGame').disabled=state.selected.length!==4}
-function start(){state.over=false;state.turn='player';state.invoked=false;state.chain={};state.finale=null;state.player=makePlayer('You');state.ai=makePlayer('The Rival');state.marketDeck=[];state.selected.forEach(k=>CHRONICLES[k].cards.forEach(r=>{state.marketDeck.push(createCard(r,k));state.marketDeck.push(createCard(r,k))}));['Open Market','Traveling Broker','Call in a Favor','Public Bounty'].forEach((n,i)=>{for(let q=0;q<3;q++)state.marketDeck.push(card(n,2+i,'action','common',i===3?'power':'grendels',i===3?3:2,i===3?'+3 Power.':'+2 Grendels.'))});shuffle(state.marketDeck);state.market=[];refill();draw(state.player,5);draw(state.ai,5);$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');log('Your story begins. Play a card from your hand.');render()}
+function start(){state.over=false;state.turn='player';state.invoked=false;state.chain={};state.finale=null;state.player=makePlayer('You');state.ai=makePlayer('The Rival');state.marketDeck=[];state.selected.forEach(k=>CHRONICLES[k].cards.forEach(r=>{state.marketDeck.push(createCard(r,k));state.marketDeck.push(createCard(r,k))}));if(typeof COMMON_CROSSROADS!=='undefined')COMMON_CROSSROADS.forEach(r=>{for(let q=0;q<3;q++)state.marketDeck.push(commonCard(r));});else ['Open Market','Traveling Broker','Call in a Favor','Public Bounty'].forEach((n,i)=>{for(let q=0;q<3;q++)state.marketDeck.push(card(n,2+i,'action','common',i===3?'power':'grendels',i===3?3:2,i===3?'+3 Power.':'+2 Grendels.'))});shuffle(state.marketDeck);state.market=[];refill();draw(state.player,5);draw(state.ai,5);$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');log('Your story begins. Play a card from your hand.');render()}
 function refill(){while(state.market.length<5&&state.marketDeck.length)state.market.push(state.marketDeck.pop())}
 function apply(p,c,isAI=false){state.chain[c.suit]=(state.chain[c.suit]||0)+1;let v=c.value||0;if(c.effect==='grendels')p.grendels+=v;if(c.effect==='power')p.power+=v;if(c.effect==='prestige')p.prestige+=v;if(c.effect==='mixed'){p.grendels+=v;p.power+=Math.min(3,v)}if(c.effect==='draw')draw(p,v||1);if(c.effect==='discount')p.discount+=v;if(c.effect==='steal'){p.grendels+=v;const foe=isAI?state.player:state.ai;foe.prestige=Math.max(0,foe.prestige-1)}if(c.effect==='doubt'){p.grendels+=v;(isAI?state.player:state.ai).discard.push(doubt())}if(c.effect==='banish'){p.grendels+=v;const ix=p.discard.findIndex(x=>x.name==='Copper');if(ix>=0)p.discard.splice(ix,1)}if(c.suit==='midnight'&&state.chain[c.suit]>=2&&c.name.includes('Whisper'))p.grendels++;if(c.suit==='midnight'&&state.chain[c.suit]>=3&&c.name.includes('Courier'))draw(p);if(c.suit==='crimson'&&state.chain[c.suit]>=2&&c.name==='Rallying Cry')p.power++;if(c.suit==='velvet'&&state.chain[c.suit]>=2&&c.name==='False Smile')p.power++;if(c.suit==='gilded'&&state.chain[c.suit]>=2&&c.name==='Silver-Tongued Factor')p.grendels++;if(c.name==='Profitable Venture'&&state.chain[c.suit]>=2)p.prestige++;if(c.name==='Hostile Takeover')p.prestige++;if(c.name==='Hundred Watching Eyes')p.grendels+=3;if(c.name==='Honored Dead')p.power++;if(c.name==='No Weakness'&&p.draw.length+p.discard.length<13)p.power+=2}
 function playCard(i,isAI=false){
@@ -123,10 +123,10 @@ render=function(){
   });
   $$('.card').forEach(cardElement=>{
     const coinName=cardElement.querySelector('h3')?.textContent;
-    if(!['Copper','Silver'].includes(coinName)||cardElement.querySelector('.grendel-coin'))return;
+    if(!['Copper','Silver','Copper Grendel','Silver Grendel'].includes(coinName)||cardElement.querySelector('.grendel-coin'))return;
     cardElement.classList.add('has-grendel-token');
     const token=document.createElement('div');
-    token.className=`grendel-coin coin-${coinName.toLowerCase()}`;
+    token.className=`grendel-coin coin-${coinName.toLowerCase().startsWith('copper')?'copper':'silver'}`;
     token.title=`${coinName} Grendel — G face; hover to see the griffin reverse`;
     token.innerHTML='<div class="grendel-coin-inner"><span class="grendel-coin-face g-face"></span><span class="grendel-coin-face griffin-face"></span></div>';
     cardElement.querySelector('.effect').before(token);
@@ -173,7 +173,7 @@ function renderLibrary(){
   const title=libraryFilter==='all'?'Complete Prototype Set':libraryFilter==='common'?'The Common Purse':CHRONICLES[libraryFilter].name;
   $('#librarySummary').innerHTML=`<strong>${title}</strong>${entries.length} unique cards · ${libraryFilter==='all'?'Choose a Chronicle to narrow the list.':'Quantities show copies included in the prototype.'}`;
   $('#libraryCards').innerHTML='';
-entries.forEach(entry=>{const article=document.createElement('article');article.className='library-card';article.style.setProperty('--suit',SUIT_COLORS[entry.key]);article.innerHTML=`<span class="library-cost">${typeof entry.cost==='number'?`${entry.cost} Grendels`:entry.cost}</span><span class="quantity">×${entry.qty}</span><h3>${entry.name}</h3><span class="type">${entry.type}${entry.durability?` · ${entry.durability} durability`:''}</span>${['Copper','Silver'].includes(entry.name)?`<div class="grendel-coin coin-${entry.name.toLowerCase()}" title="Grendel coin — hover to see the griffin face"><div class="grendel-coin-inner"><span class="grendel-coin-face g-face"></span><span class="grendel-coin-face griffin-face"></span></div></div><span class="grendel-coin-caption">G face · Griffin reverse</span>`:''}<p>${entry.text}</p>`;$('#libraryCards').append(article)});
+entries.forEach(entry=>{const article=document.createElement('article');article.className='library-card';article.style.setProperty('--suit',SUIT_COLORS[entry.key]);const coin=['Copper','Silver','Copper Grendel','Silver Grendel'].includes(entry.name);article.innerHTML=`<span class="library-cost">${typeof entry.cost==='number'?`${entry.cost} Grendels`:entry.cost}</span><span class="quantity">×${entry.qty}</span><h3>${entry.name}</h3><span class="type">${entry.type}${entry.durability?` · ${entry.durability} durability`:''}</span>${coin?`<div class="grendel-coin coin-${entry.name.toLowerCase().startsWith('copper')?'copper':'silver'}" title="Grendel coin — hover to see the griffin face"><div class="grendel-coin-inner"><span class="grendel-coin-face g-face"></span><span class="grendel-coin-face griffin-face"></span></div></div><span class="grendel-coin-caption">G face · Griffin reverse</span>`:''}<p>${entry.text}</p>`;$('#libraryCards').append(article)});
 }
 $$('.card-library-button').forEach(button=>button.onclick=openCardLibrary);
 $('#cardLibraryDialog .dialog-close').onclick=()=>$('#cardLibraryDialog').close();
@@ -184,7 +184,7 @@ function commonPurseUnavailable(isAI=false){
   if(state.turn!==(isAI?'ai':'player'))return 'Wait for your turn.';
   if(state.invoked)return 'Your Legend invocation is already used.';
   if(player.grendels<2)return 'Requires 2 Grendels.';
-  if(!player.discard.some(c=>c.name==='Copper'&&c.suit==='common'))return 'Requires a Copper in your Rest pile.';
+  if(!player.discard.some(c=>['Copper','Copper Grendel'].includes(c.name)&&c.suit==='common'))return 'Requires a Copper Grendel in your Rest pile.';
   return '';
 }
 
@@ -192,8 +192,8 @@ function invokeCommonPurse(isAI=false){
   const unavailable=commonPurseUnavailable(isAI);
   if(unavailable){if(!isAI)log(unavailable);return false;}
   const player=isAI?state.ai:state.player;
-  const index=player.discard.findIndex(c=>c.name==='Copper'&&c.suit==='common');
-  const silver=basic('Silver');
+  const index=player.discard.findIndex(c=>['Copper','Copper Grendel'].includes(c.name)&&c.suit==='common');
+  const silver=basic('Silver Grendel');
   player.grendels-=2;
   player.discard.splice(index,1,silver);
   state.invoked=true;

@@ -38,7 +38,7 @@ test('turn authority, end turn, no automatic opponent, and manual Champion effec
  let s=setup();assert.throws(()=>createEngine().move(s,1,{type:'play',id:s.ai.hand[0].id}),/turn/);
  const total=p=>p.hand.length+p.draw.length+p.discard.length+p.champions.length;
  s=createEngine().move(s,0,{type:'end'});assert.equal(s.turn,'ai');assert.equal(s.ai.hand.length,5);assert.equal(total(s.player),10);
- const c=s.ai.hand[0];s=createEngine().move(s,1,{type:'play',id:c.id});assert.equal(s.ai.hand.length,4);assert.equal(s.player.hand.length,5);
+ const c=s.ai.hand.find(c=>c.name==='Copper');s=createEngine().move(s,1,{type:'play',id:c.id});assert.equal(s.ai.hand.length,4);assert.equal(s.player.hand.length,5);
  assert.throws(()=>createEngine().move(s,0,{type:'end'}),/turn/);
 });
 test('purchase goes to the purchaser Rest and opponents cannot spend it',()=>{
