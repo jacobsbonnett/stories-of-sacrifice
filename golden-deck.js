@@ -27,6 +27,9 @@ function resolveGoldenChoice(value){
 }
 function showGoldenChoice(){
  const q=pendingCardChoice;if(!q||q.isAI)return;let d=$('#goldenChoiceDialog');
+ // Only one rules-choice dialog may occupy the browser's modal top layer.
+ // Close any completed selector left behind before presenting Pay / Decline.
+ for(const id of ['commonChoiceDialog','judgeChoiceDialog']){const other=$(`#${id}`);if(other?.open)other.close();}
  if(!d){d=document.createElement('dialog');d.id='goldenChoiceDialog';d.innerHTML='<h2></h2><img class="golden-choice-card" alt=""><p></p><div class="golden-choice-actions"></div>';document.body.append(d);d.oncancel=e=>e.preventDefault();}
  const title=d.querySelector('h2'),img=d.querySelector('img'),text=d.querySelector('p'),actions=d.querySelector('div');actions.replaceChildren();
  if(q.kind==='golden-paid'){title.textContent=`${q.card.name} — Paid Combo`;img.hidden=false;img.src=cardArtwork(q.card);text.textContent=`${q.card.text} Pay ${q.effect.cost} Grendel${q.effect.cost===1?'':'s'} for the Paid Combo?`;for(const [label,value] of [['Pay','pay'],['Decline','decline']]){const b=document.createElement('button');b.textContent=label;b.onclick=()=>resolveGoldenChoice(value);actions.append(b);}}

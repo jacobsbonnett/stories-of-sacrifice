@@ -17,6 +17,9 @@ async function api(path,body){
 }
 function showOnlineChoice(){
  const choice=state.choice;if(!choice||state.turn!=='player'){onlineChoice.close();return;}
+ // Multiplayer uses this single authoritative selector. Dismiss any local
+ // selector that could otherwise sit above it and swallow the player's click.
+ for(const id of ['commonChoiceDialog','goldenChoiceDialog','judgeChoiceDialog']){const other=$(`#${id}`);if(other?.open)other.close();}
  const cards=choice.kind==='assassin'||['butcher','red-hilt'].includes(choice.kind)?state.ai.champions:choice.kind==='sacrifice'?state.player.discard.filter(c=>(state.player.playedThisTurn||[]).includes(c.id)):choice.kind==='blacksmith'?state.market:choice.kind==='strings'?[...state.player.champions,...state.player.discard]:choice.kind==='judge-rest'?state.player.discard:choice.kind==='judge-order'?choice.cards:state.player.hand;
  const titles={assassin:'The Assassin — deal 2 damage',sacrifice:'Seraphine — choose a sacrifice',butcher:`Butcher — choose up to ${choice.remaining} Agent(s)`,'red-hilt':'Sword with the Red Hilt — choose a Champion',blacksmith:'Blacksmith — replace a Crossroads card',strings:'Strings of Fate — destroy one of your cards'};
  if(choice.kind==='golden-paid')titles[choice.kind]=`${choice.cardName} — Paid Combo`;
@@ -36,7 +39,7 @@ function showOnlineChoice(){
   const buttons=['heads','tails'].map(result=>{const b=document.createElement('button');b.textContent=result[0].toUpperCase()+result.slice(1);b.onclick=()=>sendOnline({type:'choose',result});return b;});
   $('#onlineChoiceList').replaceChildren(...buttons);if(!onlineChoice.open)onlineChoice.showModal();return;
  }
- const buttons=cards.map(c=>{const button=document.createElement('button');button.textContent=`${c.name} — ${['assassin','butcher','red-hilt'].includes(choice.kind)?`${c.durability} health`:choice.kind==='sacrifice'?`${Math.ceil(c.cost/2)} Prestige`:c.text}`;button.onclick=()=>sendOnline({type:'choose',id:c.id});return button;});
+ const buttons=cards.map(c=>{const button=document.createElement('button'),description=['assassin','butcher','red-hilt'].includes(choice.kind)?`${c.durability} health`:choice.kind==='sacrifice'?`${Math.ceil(c.cost/2)} Prestige`:c.text;if(['judge-rest','judge-order'].includes(choice.kind)){button.className='online-choice-card';const img=document.createElement('img');img.src=cardArtwork(c);img.alt='';const name=document.createElement('strong');name.textContent=c.name;const text=document.createElement('span');text.textContent=description;button.append(img,name,text);button.setAttribute('aria-label',`${c.name}. ${description}`);}else button.textContent=`${c.name} — ${description}`;button.onclick=()=>sendOnline({type:'choose',id:c.id});return button;});
  if(['butcher','blacksmith'].includes(choice.kind)){const done=document.createElement('button');done.textContent='Done';done.onclick=()=>sendOnline({type:'choose',done:true});buttons.push(done);}
  $('#onlineChoiceList').replaceChildren(...buttons);
  if(!onlineChoice.open)onlineChoice.showModal();

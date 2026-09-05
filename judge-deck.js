@@ -38,7 +38,7 @@ function showJudgeChoice(){
  const q=pendingCardChoice;if(!q||q.isAI)return;let d=$('#judgeChoiceDialog');
  if(!d){d=document.createElement('dialog');d.id='judgeChoiceDialog';d.innerHTML='<h2></h2><p></p><div class="judge-choice-list"></div>';d.oncancel=e=>e.preventDefault();document.body.append(d);}
  d.querySelector('h2').textContent=q.title;d.querySelector('p').textContent=q.kind==='judge-order'?'Choose the next card to draw. Then choose the cards that follow.':'Choose the next card to place on top of your Draw pile.';
- const pool=q.kind==='judge-rest'?state.player.discard:q.cards,buttons=pool.map(c=>{const b=document.createElement('button');b.textContent=`${c.name} — ${c.text}`;b.onclick=()=>resolveJudgeChoice(c.id);return b;});d.querySelector('.judge-choice-list').replaceChildren(...buttons);if(!d.open)d.showModal();
+ const pool=q.kind==='judge-rest'?state.player.discard:q.cards,buttons=pool.map(c=>{const b=document.createElement('button');b.className='judge-choice-card';const img=document.createElement('img');img.src=cardArtwork(c);img.alt='';const name=document.createElement('strong');name.textContent=c.name;const effect=document.createElement('span');effect.textContent=c.text;b.append(img,name,effect);b.setAttribute('aria-label',`${c.name}. ${c.text}`);b.onclick=()=>resolveJudgeChoice(c.id);return b;});d.querySelector('.judge-choice-list').replaceChildren(...buttons);if(!d.open)d.showModal();
 }
 function openJudgeChoice(kind,p,isAI,count,title,after=null){
  const pool=kind==='judge-rest'?p.discard:null;if(kind==='judge-rest'&&!pool.length)return false;
