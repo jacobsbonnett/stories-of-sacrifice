@@ -20,9 +20,9 @@ openJudgeChoice=(kind,p,isAI,count,title,after=null)=>{
  state.choice.remaining=state.choice.cards.length;return true;
 };
 openHoursChoice=(kind,p,isAI=false)=>{
- const cards=kind==='hours-rewind'?hoursRewindCards(p):(isAI?state.player:state.ai).champions;
- if(!cards.length)return false;
- if(isAI){const c=[...cards].sort((a,b)=>(b.cost||0)-(a.cost||0))[0];if(kind==='hours-rewind'){p.discard.splice(p.discard.indexOf(c),1);p.hand.push(c);}else{c.suspendedTurns=1;c.ready=false;}return true;}
+ const cards=kind==='hours-rewind'?hoursRewindCards(p):kind==='hours-suspend'?(isAI?state.player:state.ai).champions:[];
+ if(kind!=='hours-spend'&&!cards.length)return false;
+ if(isAI){if(kind==='hours-spend'){const amount=Math.min(3,p.time||0);p.time-=amount;p.power+=amount*2;return true;}const c=[...cards].sort((a,b)=>(b.cost||0)-(a.cost||0))[0];if(kind==='hours-rewind'){p.discard.splice(p.discard.indexOf(c),1);p.hand.push(c);}else{c.suspendedTurns=1;c.ready=false;}return true;}
  state.choice={kind};return true;
 };
 function swapSeats(){
@@ -66,6 +66,8 @@ function act(action){
    const i=indexOf(state.player.discard,action.id),c=state.player.discard[i];if(!(state.player.playedThisTurn||[]).includes(c.id)||c.suit!=='hours'||c.type!=='action')throw new Error('Choose an Hours action played this turn.');state.player.hand.push(...state.player.discard.splice(i,1));state.choice=null;
   }else if(choice.kind==='hours-suspend'){
    const c=state.ai.champions[indexOf(state.ai.champions,action.id)];c.suspendedTurns=1;c.ready=false;state.choice=null;
+  }else if(choice.kind==='hours-spend'){
+   const amount=Number(action.amount),max=Math.min(3,state.player.time||0);if(!Number.isInteger(amount)||amount<0||amount>max)throw new Error('Choose a valid amount of Time.');state.player.time-=amount;state.player.power+=amount*2;state.choice=null;
   }
   return;
  }

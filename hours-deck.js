@@ -21,24 +21,26 @@ function gainTime(p,n){p.time=Math.min(9,(p.time||0)+n);}
 function hoursRewindCards(p){return p.discard.filter(c=>(p.playedThisTurn||[]).includes(c.id)&&c.suit==='hours'&&c.type==='action'&&!c.returnToStock);}
 function completeHoursChoice(){const done=pendingCardChoice?.resolve;pendingCardChoice=null;const d=$('#hoursChoiceDialog');if(d?.open)d.close();render();if(done)done();}
 function resolveHoursChoice(id){
- const q=pendingCardChoice;if(!q||!['hours-rewind','hours-suspend'].includes(q.kind))return false;
+ const q=pendingCardChoice;if(!q||!['hours-rewind','hours-suspend','hours-spend'].includes(q.kind))return false;
  const p=q.isAI?state.ai:state.player,foe=q.isAI?state.player:state.ai;
- if(q.kind==='hours-rewind'){const i=p.discard.findIndex(c=>c.id===id&&(p.playedThisTurn||[]).includes(c.id));if(i<0)return false;p.hand.push(...p.discard.splice(i,1));}
+ if(q.kind==='hours-spend'){const amount=Number(id);if(!Number.isInteger(amount)||amount<0||amount>Math.min(3,p.time||0))return false;p.time-=amount;p.power+=amount*2;}
+ else if(q.kind==='hours-rewind'){const i=p.discard.findIndex(c=>c.id===id&&(p.playedThisTurn||[]).includes(c.id));if(i<0)return false;p.hand.push(...p.discard.splice(i,1));}
  else{const c=foe.champions.find(c=>c.id===id);if(!c)return false;c.suspendedTurns=1;c.ready=false;}
  completeHoursChoice();return true;
 }
 function showHoursChoice(){
  const q=pendingCardChoice;if(!q||q.isAI)return;let d=$('#hoursChoiceDialog');
  if(!d){d=document.createElement('dialog');d.id='hoursChoiceDialog';d.innerHTML='<h2></h2><p></p><div class="hours-choice-cards"></div><button class="hours-choice-skip" type="button">Skip</button>';document.body.append(d);d.oncancel=e=>e.preventDefault();}
- const cards=q.kind==='hours-rewind'?hoursRewindCards(state.player):state.ai.champions;
- d.querySelector('h2').textContent=q.kind==='hours-rewind'?'Rewind — return a played card to your hand':'Suspend — choose an opposing Champion';
- d.querySelector('p').textContent=q.kind==='hours-rewind'?'Choose an Hours action you played earlier this turn. Replaying it starts a new activation.':'That Champion cannot use its Effect on its next turn.';
- d.querySelector('.hours-choice-cards').replaceChildren(...cards.map(c=>{const b=document.createElement('button');b.className='hours-choice-card';const img=document.createElement('img');img.src=cardArtwork(c);img.alt='';const t=document.createElement('span');t.textContent=`${c.name} — ${c.text}`;b.append(img,t);b.onclick=()=>resolveHoursChoice(c.id);return b;}));
+ const cards=q.kind==='hours-rewind'?hoursRewindCards(state.player):q.kind==='hours-suspend'?state.ai.champions:[];
+ d.querySelector('h2').textContent=q.kind==='hours-rewind'?'Rewind — return a played card to your hand':q.kind==='hours-suspend'?'Suspend — choose an opposing Champion':'Aion — spend Time';
+ d.querySelector('p').textContent=q.kind==='hours-rewind'?'Choose an Hours action you played earlier this turn. Replaying it starts a new activation.':q.kind==='hours-suspend'?'That Champion cannot use its Effect on its next turn.':'Choose how much Time to spend. Each Time becomes 2 Power.';
+ const choices=q.kind==='hours-spend'?[...Array(Math.min(3,state.player.time||0)+1)].map((_,amount)=>{const b=document.createElement('button');b.textContent=amount?`Spend ${amount} Time — gain ${amount*2} Power`:'Spend no Time';b.onclick=()=>resolveHoursChoice(String(amount));return b;}):cards.map(c=>{const b=document.createElement('button');b.className='hours-choice-card';const img=document.createElement('img');img.src=cardArtwork(c);img.alt='';const t=document.createElement('span');t.textContent=`${c.name} — ${c.text}`;b.append(img,t);b.onclick=()=>resolveHoursChoice(c.id);return b;});
+ d.querySelector('.hours-choice-cards').replaceChildren(...choices);
  const skip=d.querySelector('.hours-choice-skip');skip.hidden=cards.length>0;skip.onclick=completeHoursChoice;if(!d.open)d.showModal();
 }
 function openHoursChoice(kind,p,isAI=false){
- const cards=kind==='hours-rewind'?hoursRewindCards(p):(isAI?state.player:state.ai).champions;if(!cards.length)return false;
- if(isAI){const c=[...cards].sort((a,b)=>(b.cost||0)-(a.cost||0))[0];if(kind==='hours-rewind'){p.discard.splice(p.discard.indexOf(c),1);p.hand.push(c);}else{c.suspendedTurns=1;c.ready=false;}return true;}
+ const cards=kind==='hours-rewind'?hoursRewindCards(p):kind==='hours-suspend'?(isAI?state.player:state.ai).champions:[];if(kind!=='hours-spend'&&!cards.length)return false;
+ if(isAI){if(kind==='hours-spend'){const amount=Math.min(3,p.time||0);p.time-=amount;p.power+=amount*2;return true;}const c=[...cards].sort((a,b)=>(b.cost||0)-(a.cost||0))[0];if(kind==='hours-rewind'){p.discard.splice(p.discard.indexOf(c),1);p.hand.push(c);}else{c.suspendedTurns=1;c.ready=false;}return true;}
  cardChoiceFinished=new Promise(resolve=>{pendingCardChoice={kind,isAI:false,resolve};});showHoursChoice();return true;
 }
 const applyBeforeHours=apply;
@@ -57,7 +59,7 @@ apply=function(p,c,isAI=false){
  if(c.name==='Hourglass Fracture')p.power+=3;
  if(c.name==='Glimpse Beyond Midnight')draw(p,1);
  if(count>=3){
-  if(c.name==='Aion, Keeper of Hours'){const spent=Math.min(3,p.time||0);p.time-=spent;p.power+=spent*2;}
+  if(c.name==='Aion, Keeper of Hours')openHoursChoice('hours-spend',p,isAI);
   if(c.name==='The Last Tomorrow'&&(p.time||0)>=3)draw(p,2);
   if(['Pendulum Warden','Clockwork Sentinel'].includes(c.name))openHoursChoice('hours-suspend',p,isAI);
   if(c.name==='Borrowed Hour')openHoursChoice('hours-rewind',p,isAI);
@@ -68,8 +70,8 @@ apply=function(p,c,isAI=false){
   if(c.name==='Glimpse Beyond Midnight')p.power++;
  }else if(count>=2){
   if(c.name==='Aion, Keeper of Hours')openHoursChoice('hours-rewind',p,isAI);
-  if(['The Last Tomorrow','Pendulum Warden','Borrowed Hour','Sands Unfallen','Clockwork Sentinel','Glimpse Beyond Midnight'].includes(c.name))gainTime(p,1);
-  if(['Pendulum Warden','Clockwork Sentinel','Moment Between Bells'].includes(c.name))p.power+=2;
+  if(['The Last Tomorrow','Borrowed Hour','Sands Unfallen','Clockwork Sentinel','Glimpse Beyond Midnight'].includes(c.name))gainTime(p,1);
+  if(['Pendulum Warden','Moment Between Bells'].includes(c.name))p.power+=2;
   if(c.name==='Rewind the Thread')p.power++;
   if(c.name==='Stolen Second')p.grendels+=2;
   if(c.name==='Hourglass Fracture'&&(p.time||0)>0){p.time--;draw(p,1);}

@@ -19,7 +19,7 @@ function showOnlineChoice(){
  const choice=state.choice;if(!choice||state.turn!=='player'){onlineChoice.close();return;}
  // Multiplayer uses this single authoritative selector. Dismiss any local
  // selector that could otherwise sit above it and swallow the player's click.
- for(const id of ['commonChoiceDialog','goldenChoiceDialog','judgeChoiceDialog']){const other=$(`#${id}`);if(other?.open)other.close();}
+ for(const id of ['commonChoiceDialog','goldenChoiceDialog','judgeChoiceDialog','hoursChoiceDialog']){const other=$(`#${id}`);if(other?.open)other.close();}
  const cards=choice.kind==='assassin'||['butcher','red-hilt','hours-suspend'].includes(choice.kind)?state.ai.champions:choice.kind==='sacrifice'?state.player.discard.filter(c=>(state.player.playedThisTurn||[]).includes(c.id)):choice.kind==='blacksmith'?state.market:choice.kind==='strings'?[...state.player.champions,...state.player.discard]:choice.kind==='judge-rest'?state.player.discard:choice.kind==='judge-order'?choice.cards:choice.kind==='hours-rewind'?state.player.discard.filter(c=>(state.player.playedThisTurn||[]).includes(c.id)&&c.suit==='hours'&&c.type==='action'):state.player.hand;
  const titles={assassin:'The Assassin — deal 2 damage',sacrifice:'Seraphine — choose a sacrifice',butcher:`Butcher — choose up to ${choice.remaining} Agent(s)`,'red-hilt':'Sword with the Red Hilt — choose a Champion',blacksmith:'Blacksmith — replace a Crossroads card',strings:'Strings of Fate — destroy one of your cards'};
  if(choice.kind==='golden-paid')titles[choice.kind]=`${choice.cardName} — Paid Combo`;
@@ -30,6 +30,11 @@ function showOnlineChoice(){
  if(choice.kind==='hours-rewind')titles[choice.kind]='Rewind — return a played Hours card to your hand';
  if(choice.kind==='hours-suspend')titles[choice.kind]='Suspend — choose an opposing Champion';
  $('#onlineChoiceTitle').textContent=titles[choice.kind]||`Law in Effect — discard ${choice.remaining} card(s)`;
+ if(choice.kind==='hours-spend'){
+  const text=document.createElement('p');text.textContent='Choose how much Time to convert into Power. Each Time grants 2 Power.';
+  const buttons=[...Array(Math.min(3,state.player.time||0)+1)].map((_,amount)=>{const b=document.createElement('button');b.textContent=amount?`Spend ${amount} Time — gain ${amount*2} Power`:'Spend no Time';b.onclick=()=>sendOnline({type:'choose',amount});return b;});
+  $('#onlineChoiceList').replaceChildren(text,...buttons);if(!onlineChoice.open)onlineChoice.showModal();return;
+ }
  if(choice.kind==='golden-paid'){
   const preview=document.createElement('img');preview.className='online-paid-preview';preview.src=cardArtwork({name:choice.cardName,suit:'velvet'});preview.alt=choice.cardName;
   const rules=document.createElement('p');rules.textContent=choice.cardText;
