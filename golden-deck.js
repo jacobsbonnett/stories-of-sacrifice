@@ -64,7 +64,13 @@ apply=function(p,c,isAI=false){
  }
  if(count>=2&&PAID_GOLDEN[c.name])openGoldenChoice('golden-paid',c,isAI,PAID_GOLDEN[c.name]);
 };
-const playBeforeGolden=playCard;playCard=function(i,isAI=false){const result=playBeforeGolden(i,isAI);if(pendingCardChoice&&!isAI)showGoldenChoice();return result;};
+const playBeforeGolden=playCard;playCard=function(i,isAI=false){
+ const result=playBeforeGolden(i,isAI);
+ // Do not let the Golden Deceiver UI claim choices created by another deck.
+ // Burning Judge ordering, Rest selection, and other prompts render themselves.
+ if(pendingCardChoice&&!isAI&&['golden-paid','golden-discard','vaelis-flip'].includes(pendingCardChoice.kind))showGoldenChoice();
+ return result;
+};
 function vaelisCost(isAI=false){const owner=state.legends.velvet,side=isAI?'ai':'player';return !owner?3:owner===side?2:4;}
 const invokeBeforeGolden=invoke;
 invoke=function(key,isAI=false,...args){if(key!=='velvet')return invokeBeforeGolden(key,isAI,...args);const p=isAI?state.ai:state.player,side=isAI?'ai':'player',other=isAI?'player':'ai',cost=vaelisCost(isAI);if(state.invoked||state.turn!==side||p.grendels<cost||pendingCardChoice)return false;p.grendels-=cost;state.legends.velvet=state.legends.velvet===other?null:side;state.invoked=true;openGoldenChoice('vaelis-flip',null,isAI);if(!isAI){log(`Vaelis: paid ${cost} Grendels. Choose your next coin flip.`);render();}return typeof spendExtraInvocation==='function'?spendExtraInvocation(p,true):true;};
