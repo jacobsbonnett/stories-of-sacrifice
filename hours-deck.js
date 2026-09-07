@@ -47,6 +47,7 @@ const applyBeforeHours=apply;
 apply=function(p,c,isAI=false){
  if(!hoursDefinition(c))return applyBeforeHours(p,c,isAI);
  const count=state.chain.hours=(state.chain.hours||0)+1;
+ if(c.name==='Second Hand')p.grendels++;
  if(c.name==='Aion, Keeper of Hours'){p.power+=2;gainTime(p,1);}
  if(c.name==='The Last Tomorrow')p.power+=4;
  if(c.name==='Pendulum Warden')gainTime(p,1);

@@ -27,6 +27,8 @@ const blank=(seat=0)=>{const s=createEngine().create(selected,['A','B']);s.turn=
 const find=(s,name)=>[...s.market,...s.marketDeck,...s.player.hand,...s.player.draw].find(c=>c.name===name);
 const play=(s,seat,name,prior=0)=>{const p=seat?s.ai:s.player,c=find(s,name);s.chain.hours=prior;p.hand=[c];return createEngine().move(s,seat,{type:'play',id:c.id});};
 
+test('Second Hand pays its printed Grendel and all three one-Grendel starters total five with two Coppers',()=>{for(const seat of [0,1]){let s=createEngine().create(['hours','midnight','ashen','crimson'],['A','B']);s.turn=seat?'ai':'player';let p=seat?s.ai:s.player;const owned=[...p.hand,...p.draw],names=['Second Hand','Puppy','Lost Soul'];p.hand=[...names.map(name=>owned.find(c=>c.name===name)),...owned.filter(c=>c.name==='Copper').slice(0,2)];p.draw=[];p.discard=[];p.grendels=0;for(const c of [...p.hand])s=createEngine().move(s,seat,{type:'play',id:c.id});p=seat?s.ai:s.player;assert.equal(p.grendels,5);}});
+
 test('Time and highest eligible combo tiers work for both seats',()=>{for(const seat of [0,1]){let s=blank(seat);s=play(s,seat,'Stolen Second',1);let p=seat?s.ai:s.player;assert.deepEqual([p.time,p.grendels,p.power],[1,2,0]);s=blank(seat);s=play(s,seat,'Stolen Second',3);p=seat?s.ai:s.player;assert.deepEqual([p.time,p.grendels,p.power],[1,0,2]);s=blank(seat);s=play(s,seat,'Moment Between Bells',2);p=seat?s.ai:s.player;assert.deepEqual([p.grendels,p.time,p.power],[2,2,0]);}});
 
 test('all base Effects resolve exactly for both seats',()=>{const expected={
