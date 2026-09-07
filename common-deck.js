@@ -36,7 +36,7 @@ function resolveCommonChoice(id){
  if(pendingCardChoice)showCommonChoice();else render();return true;
 }
 function showCommonChoice(){
- const choice=pendingCardChoice;if(!choice||choice.isAI)return;
+ const choice=pendingCardChoice;if(!choice||choice.isAI||!['butcher','red-hilt','blacksmith','strings'].includes(choice.kind))return;
  let dialog=$('#commonChoiceDialog');
  if(!dialog){dialog=document.createElement('dialog');dialog.id='commonChoiceDialog';dialog.innerHTML='<h2></h2><p></p><div class="choice-list"></div><button class="choice-done">Done</button>';document.body.append(dialog);dialog.oncancel=e=>e.preventDefault();}
  const p=state.player,foe=state.ai,cards=commonChoiceCards(choice.kind,p,foe);
@@ -76,7 +76,13 @@ apply=function(p,c,isAI=false){
  else if(c.name==='Strings of Fate')openCommonChoice('strings',isAI);
 };
 const playBeforeCommonDeck=playCard;
-playCard=function(i,isAI=false){const result=playBeforeCommonDeck(i,isAI);if(pendingCardChoice&&!isAI)showCommonChoice();return result;};
+playCard=function(i,isAI=false){
+ const result=playBeforeCommonDeck(i,isAI);
+ // Only open this deck's selector. Other decks (such as Burning Judge)
+ // manage their own illustrated choice dialogs.
+ if(pendingCardChoice&&!isAI&&['butcher','red-hilt','blacksmith','strings'].includes(pendingCardChoice.kind))showCommonChoice();
+ return result;
+};
 function spendExtraInvocation(p,result){if(result&&state.invoked&&(p.extraInvocations||0)>0){p.extraInvocations--;state.invoked=false;}return result;}
 const invokeBeforeWeaver=invoke;
 invoke=function(key,isAI=false,...args){return spendExtraInvocation(isAI?state.ai:state.player,invokeBeforeWeaver(key,isAI,...args));};
