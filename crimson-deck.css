@@ -28,7 +28,9 @@
 .effect-status{display:block;font:12px/16px system-ui;color:#f4e3be}
 .champion-art:hover,.champion-art:focus-visible{z-index:120;transform:scale(1.8);transform-origin:center center}
 .library-printed-card{display:block;width:100%;height:auto;margin-bottom:10px}
-#championTargets{display:grid;gap:10px}
+#championTargetDialog{width:min(900px,92vw);max-width:900px}
+#championTargets{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;max-height:65vh;overflow:auto;padding:3px}
+@media(max-width:520px){#championTargets{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #championTargetDialog{max-height:85dvh;overflow:auto}
 #lawDiscardDialog{max-height:85dvh;overflow:auto}
 @media(prefers-reduced-motion:reduce){.champion-art{transition:none}}

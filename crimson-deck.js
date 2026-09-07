@@ -32,8 +32,11 @@ function chooseAssassinTarget(isAI){
   const dialog=$('#championTargetDialog'),list=$('#championTargets');list.replaceChildren();
   cardChoiceFinished=new Promise(resolve=>{pendingCardChoice={resolve,foe};});
   for(const c of foe.champions){
-    const button=document.createElement('button');button.type='button';
-    button.textContent=`${c.name} — ${c.durability}/${championMaxHealth(c)} health → ${Math.max(0,c.durability-2)} health`;
+    const button=document.createElement('button');button.type='button';button.className='common-choice-card';
+    const img=document.createElement('img');img.src=cardArtwork(c);img.alt='';
+    const name=document.createElement('strong');name.textContent=c.name;
+    const effect=document.createElement('span');effect.textContent=`${c.durability}/${championMaxHealth(c)} health → ${Math.max(0,c.durability-2)} health · ${c.text}`;
+    button.append(img,name,effect);button.setAttribute('aria-label',`${c.name}. ${effect.textContent}`);
     button.onclick=()=>resolveAssassinTarget(c.id);list.append(button);
   }
   dialog.oncancel=e=>e.preventDefault();dialog.showModal();

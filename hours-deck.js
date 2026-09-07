@@ -88,3 +88,17 @@ const artworkBeforeHours=cardArtwork;cardArtwork=function(c){const def=hoursDefi
 const renderBeforeHours=render;render=function(){renderBeforeHours();if(!state.player)return;let counter=$('#timeCounter');if(!counter){counter=document.createElement('div');counter.id='timeCounter';counter.className='resource-counter time-counter';counter.innerHTML='<span>Time</span><b>0</b><span class="time-symbol">⌛</span>';document.querySelector('.resources')?.append(counter);}counter.hidden=!state.selected.includes('hours');counter.querySelector('b').textContent=state.player.time||0;};
 const panelBeforeHours=panel;panel=function(p,isAI){const html=panelBeforeHours(p,isAI);return state.selected.includes('hours')?html.replace('</div>',`<span>Time <b>${p.time||0}</b></span></div>`):html;};
 const libraryBeforeHours=renderLibrary;renderLibrary=function(){libraryBeforeHours();$$('#libraryCards .library-card').forEach(el=>{const name=el.querySelector('h3')?.textContent,src=cardArtwork({name,suit:'hours'});if(!src||el.querySelector('.library-printed-card'))return;const img=document.createElement('img');img.src=src;img.alt=name;img.className='library-printed-card';el.prepend(img);});};
+
+// Allegiance is an immediate victory condition. Check it at the exact moment
+// an invocation succeeds instead of waiting for end-of-turn scoring.
+const invokeBeforeImmediateAllegianceWin=invoke;
+invoke=function(key,isAI=false,...args){
+ const result=invokeBeforeImmediateAllegianceWin(key,isAI,...args),side=isAI?'ai':'player';
+ if(result&&state.selected.length===4&&state.selected.every(k=>state.legends[k]===side)){
+  if(typeof pendingCardChoice!=='undefined')pendingCardChoice=null;
+  if(Object.hasOwn(state,'choice'))state.choice=null;
+  for(const id of ['sacrificeDialog','commonChoiceDialog','goldenChoiceDialog','judgeChoiceDialog','hoursChoiceDialog']){const dialog=$("#"+id);if(dialog?.open)dialog.close();}
+  checkWin(side);
+ }
+ return result;
+};

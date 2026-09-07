@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="setup-box.css?v=centered-setup-1">
   <link rel="stylesheet" href="crimson-deck.css?v=midnight-dialog-4">
   <link rel="stylesheet" href="resource-icons.css?v=2">
+  <link rel="stylesheet" href="audio-system.css?v=1">
 </head>
 <body>
   <div id="setup" class="screen setup-screen">
@@ -39,7 +40,7 @@
   <main id="game" class="screen game-screen hidden">
     <header class="topbar">
       <div class="game-brand"><img class="header-logo" src="assets/stories-logo.png" width="1536" height="1024" alt="Stories of Sacrifice"><span class="prototype">Prototype</span></div>
-      <div class="top-actions"><button class="ghost card-library-button">Card Library</button><button id="rulesButton" class="ghost">Rules</button><button id="newGame" class="ghost">New game</button></div>
+      <div class="top-actions"><button class="ghost card-library-button">Card Library</button><button id="rulesButton" class="ghost">Rules</button><button id="soundSettingsButton" class="ghost" aria-label="Open sound settings">Sound</button><button id="newGame" class="ghost">New game</button></div>
     </header>
 
     <section id="aiPanel" class="player-panel rival"></section>
@@ -94,6 +95,16 @@
   <dialog id="resultDialog">
     <div class="result-sigil">✦</div><h2 id="resultTitle"></h2><p id="resultText"></p><button id="resultRestart" class="primary">Write another story</button>
   </dialog>
+  <dialog id="soundSettingsDialog" class="sound-settings" aria-labelledby="soundSettingsTitle">
+    <button class="dialog-close" aria-label="Close sound settings">×</button>
+    <p class="eyebrow">Audio</p>
+    <h2 id="soundSettingsTitle">Sound Settings</h2>
+    <label><span>Master volume</span><output id="masterVolumeValue">80%</output><input id="masterVolume" type="range" min="0" max="100" step="1" value="80"></label>
+    <label><span>Sound effects</span><output id="sfxVolumeValue">80%</output><input id="sfxVolume" type="range" min="0" max="100" step="1" value="80"></label>
+    <label><span>Music</span><output id="musicVolumeValue">50%</output><input id="musicVolume" type="range" min="0" max="100" step="1" value="50"></label>
+    <label class="sound-mute"><input id="soundMuted" type="checkbox"><span>Mute all sound</span></label>
+    <p class="sound-note">Music volume is ready for a future soundtrack. This version uses sound effects only.</p>
+  </dialog>
   <dialog id="cardLibraryDialog" class="library-dialog">
     <div class="library-header"><div><p class="eyebrow">Game reference</p><h2>Card Library</h2><p>Every card currently available in the prototype.</p></div><button class="dialog-close" aria-label="Close card library">×</button></div>
     <nav id="libraryFilters" class="library-filters" aria-label="Filter cards by Chronicle"></nav>
@@ -123,5 +134,6 @@
   <script src="multiplayer.js?v=gorgon-1"></script>
   <link rel="stylesheet" href="board-readability.css?v=2">
   <script src="board-readability.js?v=2"></script>
+  <script src="audio-manager.js?v=1"></script>
 </body>
 </html>

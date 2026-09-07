@@ -29,6 +29,17 @@ test('80 target persists through lower scores; allegiance still wins; resources 
  s.legends=Object.fromEntries(selected.map(k=>[k,'ai']));s=createEngine().move(s,1,{type:'end'});assert.equal(s.winner,'ai');
  assert.equal(setup().prestigeTarget,40);
 });
+test('the fourth favorable Legend ends the match immediately for either player',()=>{
+ for(const seat of [0,1]){
+  let s=setup(),side=seat?'ai':'player';s.turn=side;
+  s.legends={crimson:side,midnight:side,gilded:side,hours:null};
+  s[side].grendels=4;
+  s=createEngine().move(s,seat,{type:'invoke',key:'hours'});
+  assert.equal(s.over,true);
+  assert.equal(s.winner,side);
+  assert.equal(s.choice??null,null);
+ }
+});
 test('seat orientation, private hands and private draw order',()=>{
  const s=setup();for(const seat of [0,1]){const v=createEngine().view(s,seat);assert.equal(v.player.name,seat?'Bob':'Alice');assert.equal(v.turn,seat?'ai':'player');
  for(const pile of [v.ai.hand,v.ai.draw,v.player.draw,v.marketDeck])for(const c of pile){assert.deepEqual(Object.keys(c),['id','hidden']);assert.ok(c.id.startsWith('hidden-'));}

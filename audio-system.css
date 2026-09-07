@@ -1,0 +1,11 @@
+.sound-settings{width:min(430px,calc(100vw - 32px));border:1px solid #a9873f;background:#111a18;color:#eee5cc;padding:28px;box-shadow:0 24px 80px #000c}
+.sound-settings::backdrop{background:#030706cc;backdrop-filter:blur(3px)}
+.sound-settings h2{margin:2px 0 22px;font-family:Georgia,serif;color:#f4d47b}
+.sound-settings label:not(.sound-mute){display:grid;grid-template-columns:1fr auto;gap:8px;margin:18px 0;color:#d8ceb4}
+.sound-settings label input[type=range]{grid-column:1/-1;width:100%;accent-color:#cda84c}
+.sound-settings output{font-variant-numeric:tabular-nums;color:#f4d47b}
+.sound-settings .sound-mute{display:flex;align-items:center;gap:10px;margin-top:24px;padding:12px;border:1px solid #4d554d;background:#18211e}
+.sound-settings .sound-mute input{accent-color:#cda84c;width:18px;height:18px}
+.sound-note{font-size:.82rem;color:#9f9b8e;margin:18px 0 0}
+#soundSettingsButton[aria-pressed=true]::before{content:'× ';color:#cf5649}
+
